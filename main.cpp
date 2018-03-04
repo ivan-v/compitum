@@ -56,10 +56,10 @@ std::ostream& operator<<(std::ostream& out, trade_good const& value) {
 }
 
 enum class infrastructure_id {
-	farms
+	farm
 };
 
-constexpr std::array<infrastructure_id, 1> infrastructure_ids{{infrastructure_id::farms}};
+constexpr std::array<infrastructure_id, 1> infrastructure_ids{{infrastructure_id::farm}};
 
 struct infrastructure {
 	infrastructure_id id;
@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream& out, infrastructure const& value) {
 			   << ", Production modifier = " << value.production_modifier << " }";
 }
 
-infrastructure const farms{ infrastructure_id::farms, trade_good_id::food, 15, 1.05, 0 };
+infrastructure const farm{ infrastructure_id::farm, trade_good_id::food, 15, 1.05, 0 };
 
 struct region {
 	//pop = population
@@ -98,8 +98,27 @@ std::ostream& operator<<(std::ostream& out, region const& value) {
 		<< "\nFood:                        " << value.food;
 }
 
-int region_trade_prod(region reg) {
-	auto goods_produced = reg.provincial_production_value * reg.goods_produced_mod;
+struct collect_infra_result {
+	int base_production;
+	double production_modifier;
+};
+collect_infra_result collect_infra(std::vector<infrastructure> const& infras, trade_good_id product) {
+	collect_infra_result result{0, 1.0};
+	for (auto const& infra : infras) {
+		if (infra.product == product) {
+			result.base_production += infra.base_production;
+			result.production_modifier *= infra.production_modifier;
+		}
+	}
+	return result;
+}
+
+int region_trade_prod(region const& reg, trade_good_id product) {
+	auto [base_production, production_modifier] = collect_infra(reg.infras, product);
+	auto goods_produced = reg.provincial_production_value 
+						* reg.goods_produced_mod
+						* production_modifier 
+						+ base_production;
 	auto local_demand = reg.pop.total();
 	auto net_supply = static_cast<int>(std::round(goods_produced - local_demand));
 	return net_supply;
@@ -121,7 +140,7 @@ population kill_people(population pop, int count) {
 }
 
 region simulate_turn(region reg) {
-	reg.food.amount += region_trade_prod(reg);
+	reg.food.amount += region_trade_prod(reg, trade_good_id::food);
 	if (reg.food.amount < 0) {
 		int old_total = reg.pop.total();
 		reg.pop = kill_people(reg.pop, -reg.food.amount);
@@ -149,7 +168,7 @@ int main() {
 		},
 		{ trade_good_id::food, 10, 10 },	// goods: price constant, amount
 		{		// infrastructures
-			{ infrastructure_id::farms, trade_good_id::food, 15, 1},
+			{ farm },
 		}
 	};
 	std::cout << reg1 << "\n";
