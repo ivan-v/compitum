@@ -98,18 +98,10 @@ std::ostream& operator<<(std::ostream& out, region const& value) {
 		<< "\nFood:                        " << value.food;
 }
 
-int region_trade_prod(
-		int provincial_production_value,
-		double goods_produced_mod,
-		int pop,
-		std::vector<infrastructure> const& infras) {
-	auto goods_produced = provincial_production_value
-		* goods_produced_mod
-		* farms.production_modifier
-		+ farms.base_production;
-	auto local_demand = pop;
+int region_trade_prod(region reg) {
+	auto goods_produced = reg.provincial_production_value * reg.goods_produced_mod;
+	auto local_demand = reg.pop.total();
 	auto net_supply = static_cast<int>(std::round(goods_produced - local_demand));
-	//std::cout<<net_supply;
 	return net_supply;
 }
 
@@ -129,7 +121,7 @@ population kill_people(population pop, int count) {
 }
 
 region simulate_turn(region reg) {
-	reg.food.amount += region_trade_prod(reg.provincial_production_value, reg.goods_produced_mod, reg.pop.total(), reg.infras);
+	reg.food.amount += region_trade_prod(reg);
 	if (reg.food.amount < 0) {
 		int old_total = reg.pop.total();
 		reg.pop = kill_people(reg.pop, -reg.food.amount);
