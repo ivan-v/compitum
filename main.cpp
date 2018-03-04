@@ -16,7 +16,6 @@ constexpr std::array<faction_id, 7> faction_ids{{faction_id::bandits, faction_id
 using opinion_map = std::map<faction_id, int>;
 
 struct faction {
-	faction_id id;
 	int wealth; 	//TODO
 	int pop;
 	opinion_map opinions;
@@ -36,8 +35,15 @@ struct population {
 	}
 };
 
+enum class trade_good_id {
+	food
+};
+
+constexpr std::array<trade_good_id, 1> trade_good_ids{{trade_good_id::food}};
+
+
 struct trade_good {
-	//string name;
+	trade_good_id id;
 	double price_const;
 	int amount;
 };
@@ -76,11 +82,13 @@ int region_trade_prod(int provincial_production_value, double goods_produced_mod
 
 region simulate_turn(region r) {
 	r.food.amount = region_trade_prod(r.provincial_production_value, r.goods_produced_mod, r.pop.total());
-	if(r.food.amount < 0){
-		std::cout << "The people starve!\n" << -r.food.amount << " people have died.\n";
-		//r.pop.total = std::max(0, r.pop.total() + r.food.amount);
-		int starved = static_cast<int>(-r.food.amount / static_cast<double>(faction_ids.size()));
-		for (auto& [id, fac] : r.pop.factions) {
+	if(r.food.amount < 0) {
+
+		//TODO: Don't allow negative population
+		int starved = static_cast<int>(-r.food.amount / static_cast<double>(faction_ids.size())); //TODO: not all people starve
+		std::cout << "The people starve!\n" << starved << " people have died.\n";
+		for (auto& item : r.pop.factions) {
+			auto& fac = item.second;
 			fac.pop -= starved;
 		}
 	}
@@ -90,20 +98,25 @@ region simulate_turn(region r) {
 int main() {
 //	std::cout << "Hello, world.\n";
 	region reg1 {
-		80,		// provincial production value
-//		100,		// population
-		1.00,   	// "goods produced" modifier
-		{},		//total population
-		{ 10, 1 }	// food: amount, cost
+		30,		// provincial production value
+		1.00,   // "goods produced" modifier
+		{		// population
+			{	//   factions:  wealth, population, opinions
+				{ faction_id::bandits,     { 0, 10, {} } },
+				{ faction_id::blacksmiths, { 0, 20, {} } },
+				{ faction_id::builders,    { 0,  0, {} } },
+				{ faction_id::craftsmen,   { 0,  0, {} } },
+				{ faction_id::guards,      { 0,  0, {} } },
+				{ faction_id::traders,     { 0, 10, {} } },
+				{ faction_id::prostitutes, { 0, 10, {} } },
+			}
+		},
+		{ trade_good_id::food, 10, 1 }	// goods: amount, cost
 	};
 //	std::cout << reg1 << "\n";
 	
 	reg1 = simulate_turn(reg1);
 
-
 	std::cout << reg1 << "\n";
-
-
-
 
 }
