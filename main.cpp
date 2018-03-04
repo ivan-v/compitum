@@ -80,17 +80,28 @@ int region_trade_prod(int provincial_production_value, double goods_produced_mod
 	return net_supply;
 }
 
+// TODO: Don't always round fractional populations up.
+population kill_people(population pop, int count) {
+	double survival_rate = static_cast<double>(pop.total() - count) / pop.total();
+	int killed = 0;
+	for (auto pos = begin(pop.factions);
+			pos != end(pop.factions) && killed < count;
+			++pos) {
+		auto& fac = pos->second;
+		int new_pop = static_cast<int>(std::floor(fac.pop * survival_rate));
+		killed += fac.pop - new_pop;
+		fac.pop = new_pop;
+	}
+	return pop;
+}
+
 region simulate_turn(region r) {
 	r.food.amount = region_trade_prod(r.provincial_production_value, r.goods_produced_mod, r.pop.total());
-	if(r.food.amount < 0) {
-
-		//TODO: Don't allow negative population
-		int starved = static_cast<int>(-r.food.amount / static_cast<double>(faction_ids.size())); //TODO: not all people starve
+	if (r.food.amount < 0) {
+		int old_total = r.pop.total();
+		r.pop = kill_people(r.pop, -r.food.amount);
+		int const starved = old_total - r.pop.total();
 		std::cout << "The people starve!\n" << starved << " people have died.\n";
-		for (auto& item : r.pop.factions) {
-			auto& fac = item.second;
-			fac.pop -= starved;
-		}
 	}
 	return r;
 }
@@ -113,7 +124,7 @@ int main() {
 		},
 		{ trade_good_id::food, 10, 1 }	// goods: amount, cost
 	};
-//	std::cout << reg1 << "\n";
+	std::cout << reg1 << "\n";
 	
 	reg1 = simulate_turn(reg1);
 
