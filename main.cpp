@@ -6,6 +6,11 @@ struct trade_good {
 	int amount;
 };
 
+std::ostream& operator<<(std::ostream& out, trade_good const& value) {
+	return out << "{ Price constant = " << value.price_const
+			   << ", Amount = "         << value.amount << " }";
+}
+
 struct region {
 	//pop = population
 	int provincial_production_value, goods_produced_mod,
@@ -13,6 +18,14 @@ struct region {
 
 	trade_good food;
 };
+
+std::ostream& operator<<(std::ostream& out, region const& value) {
+	return out
+		<<   "Provincial production value: " << value.provincial_production_value
+		<< "\nGoods produced mod:          " << value.goods_produced_mod
+		<< "\nPopulation:                  " << value.pop
+		<< "\nFood:                        " << value.food;
+}
 
 int region_trade_prod(int provincial_production_value, int goods_produced_mod, int pop) {
 	auto goods_produced = provincial_production_value * 2 * goods_produced_mod;
@@ -31,8 +44,10 @@ void simulate_turn_region(region r) {
 
 int main() {
 //	std::cout << "Hello, world.\n";
-	region reg1;
+	region reg1{};
 	reg1.provincial_production_value = 3;
+	std::cout << reg1 << "\n";
+
 
 
 
