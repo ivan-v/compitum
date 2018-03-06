@@ -6,36 +6,6 @@
 #include <numeric>
 #include <vector>
 
-enum class faction_id {
-	bandits, blacksmiths, builders, craftsmen, farmers, guards, traders, prostitutes
-};
-
-constexpr std::array<faction_id, 8> faction_ids{{faction_id::bandits, faction_id::blacksmiths, 
-	faction_id::builders, faction_id::craftsmen, faction_id::farmers, faction_id::guards, faction_id::traders, faction_id::prostitutes}};
-
-
-using opinion_map = std::map<faction_id, int>;
-
-struct faction {
-	int wealth; 	//TODO
-	int pop;
-	opinion_map opinions;
-};
-
-struct population {
-	std::map<faction_id, faction> factions;
-
-	int total() const {
-		return std::accumulate(
-			begin(factions), end(factions),
-			0,
-			[](int acc, auto const& item) {
-				faction const& fac = item.second;
-				return acc + fac.pop;
-			});
-	}
-};
-
 enum class trade_good_id {
 	food, water, wood, stone, marble
 };
@@ -55,11 +25,41 @@ std::ostream& operator<<(std::ostream& out, trade_good const& value) {
 			   << ", Amount = "         << value.amount << " }";
 }
 
-enum class infrastructure_id {
-	farm
+enum class faction_id {
+	bandits, blacksmiths, builders, craftsmen, farmers, guards, traders, prostitutes
 };
 
-constexpr std::array<infrastructure_id, 1> infrastructure_ids{{infrastructure_id::farm}};
+constexpr std::array<faction_id, 8> faction_ids{{faction_id::bandits, faction_id::blacksmiths, 
+	faction_id::builders, faction_id::craftsmen, faction_id::farmers, faction_id::guards, faction_id::traders, faction_id::prostitutes}};
+
+using opinion_map = std::map<faction_id, int>;
+
+struct faction {
+	int wealth; 	//TODO
+	int pop;
+	opinion_map opinions;
+	std::array<trade_good_id, 2> food_and_water{{trade_good_id::food, trade_good_id::water}};
+};
+
+struct population {
+	std::map<faction_id, faction> factions;
+
+	int total() const {
+		return std::accumulate(
+			begin(factions), end(factions),
+			0,
+			[](int acc, auto const& item) {
+				faction const& fac = item.second;
+				return acc + fac.pop;
+			});
+	}
+};
+
+enum class infrastructure_id {
+	farm, well
+};
+
+constexpr std::array<infrastructure_id, 2> infrastructure_ids{{infrastructure_id::farm, infrastructure_id::well}};
 
 struct infrastructure {
 	infrastructure_id id;
@@ -67,7 +67,7 @@ struct infrastructure {
 	int base_production;
 	double production_modifier;
 	int maintenance;
-	trade_good build_cost;
+	//trade_good build_cost;  TODO
 };
 
 std::ostream& operator<<(std::ostream& out, infrastructure const& value) {
@@ -76,6 +76,7 @@ std::ostream& operator<<(std::ostream& out, infrastructure const& value) {
 }
 
 infrastructure const farm{ infrastructure_id::farm, trade_good_id::food, 15, 1.05, 0 };
+infrastructure const well{ infrastructure_id::well, trade_good_id::water, 40, 1.00, 0 };
 
 struct region {
 	//pop = population
@@ -85,7 +86,7 @@ struct region {
 
 	population pop;
 
-	trade_good food;
+	trade_good food, water;
 
 	std::vector<infrastructure> infras;
 };
@@ -95,7 +96,9 @@ std::ostream& operator<<(std::ostream& out, region const& value) {
 		<<   "Provincial production value: " << value.provincial_production_value
 		<< "\nGoods produced mod:          " << value.goods_produced_mod
 		<< "\nPopulation:                  " << value.pop.total()
-		<< "\nFood:                        " << value.food;
+		<< "\nFood:                        " << value.food
+		<< "\nWater:                       " << value.water;
+//		<< "\nBuildings:                   " << value.infras;
 }
 
 struct collect_infra_result {
@@ -139,14 +142,30 @@ population kill_people(population pop, int count) {
 	return pop;
 }
 
-region simulate_turn(region reg) {
-	reg.food.amount += region_trade_prod(reg, trade_good_id::food);
+region starve_turn_tick(region reg) {
+	int food_produced = region_trade_prod(reg, trade_good_id::food);
+	reg.food.amount += food_produced;
+	int old_total = reg.pop.total();
 	if (reg.food.amount < 0) {
-		int old_total = reg.pop.total();
 		reg.pop = kill_people(reg.pop, -reg.food.amount);
 		int const starved = old_total - reg.pop.total();
 		std::cout << "The people starve!\n" << starved << " people have died.\n";
 	}
+	if (food_produced > 0) {
+		std::cout << "A surplus of " << food_produced << " food has been produced.\n";	
+	}
+	reg.water.amount += region_trade_prod(reg, trade_good_id::water);
+	if (reg.water.amount < 0) {
+		int old_total = reg.pop.total();
+		reg.pop = kill_people(reg.pop, -reg.water.amount);
+		int const starved = old_total - reg.pop.total();
+		std::cout << "The people die of thirst!\n" << starved << " people have died.\n";
+	}
+	return reg;
+}
+
+region simulate_turn(region reg) {
+	reg = starve_turn_tick(reg);
 	return reg;
 }
 
@@ -167,8 +186,9 @@ int main() {
 			}
 		},
 		{ trade_good_id::food, 10, 10 },	// goods: price constant, amount
+		{ trade_good_id::water, 10, 10 },
 		{		// infrastructures
-			{ farm },
+			{ farm, well },
 		}
 	};
 	std::cout << reg1 << "\n";
