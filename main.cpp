@@ -30,7 +30,8 @@ enum class faction_id {
 };
 
 constexpr std::array<faction_id, 8> faction_ids{{faction_id::bandits, faction_id::blacksmiths, 
-	faction_id::builders, faction_id::craftsmen, faction_id::farmers, faction_id::guards, faction_id::traders, faction_id::prostitutes}};
+	faction_id::builders, faction_id::craftsmen, faction_id::farmers, faction_id::guards, 
+	faction_id::traders, faction_id::prostitutes}};
 
 using opinion_map = std::map<faction_id, int>;
 
@@ -122,9 +123,24 @@ int region_trade_prod(region const& reg, trade_good_id product) {
 						* reg.goods_produced_mod
 						* production_modifier 
 						+ base_production;
+	return static_cast<int>(std::round(goods_produced));
+}
+
+int region_net_trade_prod(region const& reg, trade_good_id product) {
+	auto goods_produced = region_trade_prod(reg, product);
 	auto local_demand = reg.pop.total();
 	auto net_supply = static_cast<int>(std::round(goods_produced - local_demand));
 	return net_supply;
+}
+
+
+//TODO (urgent): replace food.price_const with whatever product is in the param
+int regional_trade_good_price(region const& reg, trade_good_id product){
+	auto goods_produced = region_trade_prod(reg, product);
+	auto local_demand = reg.pop.total();
+	auto price = abs(local_demand) / goods_produced * reg.food.price_const;
+	if (price < 1) price = 1;
+	return static_cast<int>(std::round (price));	
 }
 
 // TODO: Don't always round fractional populations up.
@@ -143,6 +159,8 @@ population kill_people(population pop, int count) {
 }
 
 region starve_turn_tick(region reg) {
+	std::cout << "Regional price of food: " << regional_trade_good_price(reg, trade_good_id::food) << '\n';
+
 	int food_produced = region_trade_prod(reg, trade_good_id::food);
 	reg.food.amount += food_produced;
 	int old_total = reg.pop.total();
@@ -177,7 +195,7 @@ int main() {
 		{		// population
 			{	//   factions:  wealth, population, opinions
 				{ faction_id::bandits,     { 0, 10, {} } },
-				{ faction_id::blacksmiths, { 0, 20, {} } },
+				{ faction_id::blacksmiths, { 0, -20, {} } },
 				{ faction_id::builders,    { 0,  0, {} } },
 				{ faction_id::craftsmen,   { 0,  0, {} } },
 				{ faction_id::guards,      { 0,  0, {} } },
@@ -185,8 +203,8 @@ int main() {
 				{ faction_id::prostitutes, { 0, 10, {} } },
 			}
 		},
-		{ trade_good_id::food, 10, 10 },	// goods: price constant, amount
-		{ trade_good_id::water, 10, 10 },
+		{ trade_good_id::food, 50, 10 },	// goods: price constant, amount
+		{ trade_good_id::water, 0, 10 },
 		{		// infrastructures
 			{ farm, well },
 		}
