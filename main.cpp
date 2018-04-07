@@ -15,10 +15,7 @@
 
 using namespace std::literals;
 
-template <class Duration>
-void wait(Duration d) { // unrelated to the in-game time
-    std::this_thread::sleep_for(d);
-}
+using std::this_thread::sleep_for;
 
 struct region {
     // pop = population
@@ -61,9 +58,9 @@ collect_infra_result collect_infra(
 
 int gross_production(region const& reg, trade_good_id product) {
     auto infra = collect_infra(reg.infras, product);
-    auto goods_produced = reg.provincial_production_value 
+    auto goods_produced = reg.provincial_production_value
                         * reg.goods_produced_mod
-                        * infra.production_modifier 
+                        * infra.production_modifier
                         + infra.base_production;
     return static_cast<int>(std::round(goods_produced));
 }
@@ -83,7 +80,7 @@ int get_price(region const& reg, trade_good_id product){
     auto price = std::max(
         static_cast<double>(local_demand) / goods_produced * constant,
         1.0);
-    return static_cast<int>(std::round(price));        
+    return static_cast<int>(std::round(price));
 }
 
 int wealth_change_of_farmers(region const& reg){
@@ -125,7 +122,7 @@ region update_food_amount(region reg) {
     if (food_produced > 0) {
         std::cout
             << "A surplus of " << food_produced
-            << " food has been produced.\n";  
+            << " food has been produced.\n";
     }
     return reg;
 }
@@ -162,9 +159,9 @@ region simulate_turn(region reg) {
 void print_slow(std::string text){
     for (char& c : text){
         std::cout << c << std::flush;
-        wait(125ms);
-        if (c == '.') 
-            wait(225ms);
+        sleep_for(125ms);
+        if (c == '.')
+            sleep_for(225ms);
     }
     std::cout << "\n";
 }
@@ -203,7 +200,7 @@ void print_world_time(world_time t) {
         << " on " << get_month_name(t.month)
         << " " << t.day
         << ", the year of our lord " << t.year
-        << "\n"; 
+        << "\n";
 }
 
 void initialize_time() {
@@ -211,7 +208,7 @@ void initialize_time() {
 }
 
 void get_ingame_time() {
-    // TODO 
+    // TODO
 }
 
 struct world {
@@ -221,7 +218,7 @@ struct world {
 
 int main() {
     print_slow("Welcome, player 1. Welcome...");
-    wait(1s);
+    sleep_for(1s);
 
     region reg1 {
         30,         // provincial production value
@@ -246,7 +243,7 @@ int main() {
 
     world w {
         reg1,
-        {1352, 1, 2, 3, 4}, 
+        {1352, 1, 2, 3, 4},
     };
 
     std::cout << reg1 << "\n";
