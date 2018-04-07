@@ -75,8 +75,10 @@ int regional_trade_good_price(region const& reg, trade_good_id product){
     auto goods_produced = region_trade_prod(reg, product);
     auto local_demand = reg.pop.total();
     auto price = std::max(
-            std::abs(local_demand) / goods_produced * reg.food.price_const,
-            1.0);
+        static_cast<double>(std::abs(local_demand))
+            / goods_produced
+            * get_price_constant(reg.food.id),
+        1.0);
     return static_cast<int>(std::round(price));        
 }
 
@@ -224,9 +226,9 @@ int main() {
                 { faction_id::prostitutes, { 0, 10, {} } },
             }
         },
-        { trade_good_id::food, 50, 10 },    // goods: price constant, amount
-        { trade_good_id::water, 0, 10 },
-        { farm, well },                     // infrastructures
+        { trade_good_id::food, 10 },    // goods: price constant, amount
+        { trade_good_id::water, 10 },
+        { farm, well },                 // infrastructures
     };
 
     world w {
