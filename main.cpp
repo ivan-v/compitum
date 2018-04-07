@@ -297,4 +297,7 @@ int main() {
 
 	std::cout << reg1 << "\n";
 
+        (void)trade_good_ids;
+        (void)faction_ids;
+        (void)infrastructure_ids;
 }
