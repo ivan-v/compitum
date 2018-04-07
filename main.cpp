@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <array>
-#include <chrono>   
+#include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
