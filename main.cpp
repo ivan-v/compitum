@@ -14,6 +14,13 @@
 #include "population.hpp"
 #include "trade_good.hpp"
 
+using namespace std::literals;
+
+template <class Duration>
+void wait(Duration d) { // unrelated to the in-game time
+    std::this_thread::sleep_for(d);
+}
+
 struct region {
     // pop = population
     int provincial_production_value;
@@ -151,15 +158,11 @@ region simulate_turn(region reg) {
 void print_slow(std::string text){
     for (char& c : text){
         std::cout << c << std::flush;
-        std::this_thread::sleep_for(std::chrono::milliseconds(125));
+        wait(125ms);
         if (c == '.') 
-            std::this_thread::sleep_for(std::chrono::milliseconds(225));
+            wait(225ms);
     }
     std::cout << "\n";
-}
-
-void wait(int milliseconds) { //unrelated to the in-game time
-    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 struct world_time {
@@ -213,8 +216,8 @@ struct world {
 };
 
 int main() {
-    //print_slow("Welcome, player 1. Welcome...");
-    //wait(1000);
+    print_slow("Welcome, player 1. Welcome...");
+    wait(1s);
 
     region reg1 {
         30,         // provincial production value
