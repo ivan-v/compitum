@@ -74,10 +74,9 @@ int region_net_trade_prod(region const& reg, trade_good_id product) {
 int regional_trade_good_price(region const& reg, trade_good_id product){
     auto goods_produced = region_trade_prod(reg, product);
     auto local_demand = reg.pop.total();
+    auto constant = get_price_constant(product);
     auto price = std::max(
-        static_cast<double>(std::abs(local_demand))
-            / goods_produced
-            * get_price_constant(product),
+        static_cast<double>(local_demand) / goods_produced * constant,
         1.0);
     return static_cast<int>(std::round(price));        
 }
