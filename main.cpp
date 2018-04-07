@@ -250,9 +250,4 @@ int main() {
     reg1 = simulate_turn(reg1);
 
     std::cout << reg1 << "\n";
-
-    // Ignore yet-to-be-used variables.
-    (void)trade_good_ids;
-    (void)faction_ids;
-    (void)infrastructure_ids;
 }

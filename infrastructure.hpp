@@ -8,11 +8,6 @@
 
 enum class infrastructure_id { farm, well };
 
-constexpr std::array<infrastructure_id, 2> infrastructure_ids{{
-    infrastructure_id::farm,
-    infrastructure_id::well
-}};
-
 struct infrastructure {
     infrastructure_id id;
     trade_good_id product;
