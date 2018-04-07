@@ -5,6 +5,10 @@
 #include <map>
 #include <numeric>
 #include <vector>
+#include <string>
+
+#include <thread>
+#include <chrono>   
 
 enum class trade_good_id {
 	food, water, wood, stone, marble
@@ -133,7 +137,6 @@ int region_net_trade_prod(region const& reg, trade_good_id product) {
 	return net_supply;
 }
 
-
 //TODO (urgent): replace food.price_const with whatever product is in the param
 int regional_trade_good_price(region const& reg, trade_good_id product){
 	auto goods_produced = region_trade_prod(reg, product);
@@ -142,6 +145,14 @@ int regional_trade_good_price(region const& reg, trade_good_id product){
 	if (price < 1) price = 1;
 	return static_cast<int>(std::round (price));	
 }
+
+int wealth_change_of_farmers(region const& reg){
+	return regional_trade_good_price(reg, trade_good_id::food)-2;
+}
+
+// double tax_farmers(region const& reg, double tax_rate){
+// 	return reg.pop.faction_id::farmers.pop;
+// }
 
 // TODO: Don't always round fractional populations up.
 population kill_people(population pop, int count) {
@@ -187,15 +198,80 @@ region simulate_turn(region reg) {
 	return reg;
 }
 
+void print_slow(std::string text){
+	for (char& c : text){
+		std::cout << c;
+		std::this_thread::sleep_for(std::chrono::milliseconds(125));
+		if (c == '.') 
+			std::this_thread::sleep_for(std::chrono::milliseconds(225));
+	}
+	std::cout << "\n";
+}
+
+void wait(int milliseconds) { //unrelated to the in-game time
+		std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
+
+struct world_time {
+	int year;  //1352 through +++
+	int month; //1 through 12
+	int day;   //1 through 30, for now
+	int hour;  //0 through 23
+	int minute;//0 through 59
+};
+
+std::string get_month_name(int month) {
+	switch (month) {
+		case 1: return "January";
+		case 2: return "February";
+		case 3: return "March";
+		case 4: return "April";
+		case 5: return "May";
+		case 6: return "June";
+		case 7: return "July";
+		case 8: return "August";
+		case 9: return "September";
+		case 10: return "October";
+		case 11: return "November";
+		case 12: return "December";
+	}
+	return "-1";
+}
+
+void print_world_time(world_time t) {
+	std::string minute_string = (t.minute < 10 ? "0" : "") + std::to_string(t.minute);
+	std::cout
+		<< t.hour << ":" << minute_string
+	    << " on " << get_month_name(t.month)
+	    << " " << t.day
+	    << ", the year of our lord " << t.year
+	    << "\n"; 
+}
+
+void initialize_time() {
+	//TODO
+}
+
+void get_ingame_time() {
+	//TODO 
+}
+
+struct world {
+	region reg1; //TODO: Make vector of regions
+	world_time t1;
+};
+
 int main() {
-//	std::cout << "Hello, world.\n";
+	print_slow("Welcome, player 1. Welcome...");
+	wait(1000);
+		
 	region reg1 {
 		30,		// provincial production value
 		1.00,   // "goods produced" modifier
 		{		// population
 			{	//   factions:  wealth, population, opinions
 				{ faction_id::bandits,     { 0, 10, {} } },
-				{ faction_id::blacksmiths, { 0, -20, {} } },
+				{ faction_id::blacksmiths, { 0, 20, {} } },
 				{ faction_id::builders,    { 0,  0, {} } },
 				{ faction_id::craftsmen,   { 0,  0, {} } },
 				{ faction_id::guards,      { 0,  0, {} } },
@@ -205,11 +281,17 @@ int main() {
 		},
 		{ trade_good_id::food, 50, 10 },	// goods: price constant, amount
 		{ trade_good_id::water, 0, 10 },
-		{		// infrastructures
-			{ farm, well },
-		}
+		{	farm, well, }, 			//infrastructures
 	};
+
+	world w {
+		reg1,
+		{1352, 1, 2, 3, 4}, 
+	};
+
 	std::cout << reg1 << "\n";
+
+	print_world_time(w.t1);
 	
 	reg1 = simulate_turn(reg1);
 
