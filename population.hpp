@@ -1,9 +1,9 @@
 #ifndef POPULATION_INCLUDED
 #define POPULATION_INCLUDED
 
-#include <map>
-
 #include "faction.hpp"
+
+#include <map>
 
 struct population {
     std::map<faction_id, faction> factions;

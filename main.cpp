@@ -1,3 +1,9 @@
+#include "faction.hpp"
+#include "infrastructure.hpp"
+#include "population.hpp"
+#include "trade_good.hpp"
+#include "region.hpp"
+
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -6,12 +12,6 @@
 #include <thread>
 #include <vector>
 #include <string>
-
-#include "faction.hpp"
-#include "infrastructure.hpp"
-#include "population.hpp"
-#include "trade_good.hpp"
-#include "region.hpp"
 
 using namespace std::literals;
 

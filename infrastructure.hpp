@@ -1,10 +1,10 @@
 #ifndef INFRASTRUCTURE_INCLUDED
 #define INFRASTRUCTURE_INCLUDED
 
+#include "trade_good.hpp"
+
 #include <array>
 #include <ostream>
-
-#include "trade_good.hpp"
 
 enum class infrastructure_id { farm, well };
 

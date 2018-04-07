@@ -1,10 +1,10 @@
 #ifndef REGION_INCLUDED
 #define REGION_INCLUDED
 
-#include <vector>
-
 #include "infrastructure.hpp"
 #include "population.hpp"
+
+#include <vector>
 
 struct region {
     // pop = population
