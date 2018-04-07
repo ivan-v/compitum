@@ -11,31 +11,7 @@
 #include <thread>
 #include <chrono>   
 
-enum class trade_good_id {
-    food, water, wood, stone, marble
-};
-
-constexpr std::array<trade_good_id, 5> trade_good_ids{{
-    trade_good_id::food,
-    trade_good_id::water,
-    trade_good_id::stone,
-    trade_good_id::marble,
-    trade_good_id::wood
-}};
-
-
-struct trade_good {
-    trade_good_id id;
-    double price_const;
-    int amount;
-};
-
-std::ostream& operator<<(std::ostream& out, trade_good const& value) {
-    return out
-        << "{ Price constant = " << value.price_const
-        << ", Amount = "         << value.amount
-        << " }";
-}
+#include "trade_good.hpp"
 
 enum class faction_id {
     bandits,
