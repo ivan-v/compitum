@@ -98,11 +98,11 @@ void print_slow(std::string text){
 }
 
 struct world_time {
-    int year;  //1352 through +++
-    int month; //1 through 12
-    int day;   //1 through 30, for now
-    int hour;  //0 through 23
-    int minute;//0 through 59
+    int year;
+    int month;  // 1 through 12
+    int day;    // 1 through 31
+    int hour;   // 0 through 23
+    int minute; // 0 through 59
 };
 
 std::string get_month_name(int month) {
