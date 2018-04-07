@@ -1,4 +1,6 @@
 #include "trade_good.hpp"
+
+#include <cassert>
  
 std::string to_string(trade_good_id id) {
     switch (id) {
@@ -8,6 +10,8 @@ std::string to_string(trade_good_id id) {
         case trade_good_id::marble: return "marble";
         case trade_good_id::wood:   return "wood";
     }
+    assert(false);
+    return "trade_good_id{" + std::to_string(static_cast<int>(id)) + "}";
 }
 
 int get_price_constant(trade_good_id id) {
@@ -18,6 +22,8 @@ int get_price_constant(trade_good_id id) {
         case trade_good_id::marble: return 5;
         case trade_good_id::wood:   return 2;
     }
+    assert(false);
+    return 0;
 }
 
 std::ostream& operator<<(std::ostream& out, trade_good const& value) {
