@@ -12,6 +12,7 @@ add_executable(main
     infrastructure.cpp
     main.cpp
     population.cpp
+    region.cpp
     trade_good.cpp
     )
 

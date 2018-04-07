@@ -2,7 +2,6 @@
 #include <array>
 #include <chrono>
 #include <cmath>
-#include <iomanip>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -12,79 +11,14 @@
 #include "infrastructure.hpp"
 #include "population.hpp"
 #include "trade_good.hpp"
+#include "region.hpp"
 
 using namespace std::literals;
 
 using std::this_thread::sleep_for;
 
-struct region {
-    // pop = population
-    int provincial_production_value;
-    double goods_produced_mod;
-    population pop;
-    trade_good_amount_map trade_good_amounts;
-    std::vector<infrastructure> infras;
-};
-
-std::ostream& operator<<(std::ostream& out, region const& value) {
-    out << "Provincial production value: " << value.provincial_production_value
-        << "\nGoods produced mod:          " << value.goods_produced_mod
-        << "\nPopulation:                  " << value.pop.total();
-    for (auto [id, amount] : value.trade_good_amounts)
-        out << "\n"
-            << std::setw(29) << std::left
-            << (to_string(id) + ":") << amount;
-    // out << "\nBuildings:                   " << value.infras;
-    return out;
-}
-
-struct collect_infra_result {
-    int base_production;
-    double production_modifier;
-};
-
-collect_infra_result collect_infra(
-        std::vector<infrastructure> const& infras,
-        trade_good_id product) {
-    collect_infra_result result{0, 1.0};
-    for (auto const& infra : infras) {
-        if (infra.product == product) {
-            result.base_production += infra.base_production;
-            result.production_modifier *= infra.production_modifier;
-        }
-    }
-    return result;
-}
-
-int gross_production(region const& reg, trade_good_id product) {
-    auto infra = collect_infra(reg.infras, product);
-    auto goods_produced = reg.provincial_production_value
-                        * reg.goods_produced_mod
-                        * infra.production_modifier
-                        + infra.base_production;
-    return static_cast<int>(std::round(goods_produced));
-}
-
-int net_production(region const& reg, trade_good_id product) {
-    auto goods_produced = gross_production(reg, product);
-    auto local_demand = reg.pop.total();
-    auto net_supply =
-        static_cast<int>(std::round(goods_produced - local_demand));
-    return net_supply;
-}
-
-int get_price(region const& reg, trade_good_id product){
-    auto goods_produced = gross_production(reg, product);
-    auto local_demand = reg.pop.total();
-    auto constant = get_price_constant(product);
-    auto price = std::max(
-        static_cast<double>(local_demand) / goods_produced * constant,
-        1.0);
-    return static_cast<int>(std::round(price));
-}
-
 int wealth_change_of_farmers(region const& reg){
-    return get_price(reg, trade_good_id::food)-2;
+    return get_price(reg, trade_good_id::food) - 2;
 }
 
 // double tax_farmers(region const& reg, double tax_rate){
