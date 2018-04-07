@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <numeric>
@@ -241,7 +242,7 @@ region simulate_turn(region reg) {
 
 void print_slow(std::string text){
     for (char& c : text){
-        std::cout << c;
+        std::cout << c << std::flush;
         std::this_thread::sleep_for(std::chrono::milliseconds(125));
         if (c == '.') 
             std::this_thread::sleep_for(std::chrono::milliseconds(225));
