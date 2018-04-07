@@ -3,8 +3,6 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <map>
-#include <numeric>
 #include <vector>
 #include <string>
 
@@ -12,21 +10,8 @@
 #include <chrono>   
 
 #include "faction.hpp"
+#include "population.hpp"
 #include "trade_good.hpp"
-
-struct population {
-    std::map<faction_id, faction> factions;
-
-    int total() const {
-        return std::accumulate(
-                begin(factions), end(factions),
-                0,
-                [](int acc, auto const& item) {
-                    faction const& fac = item.second;
-                    return acc + fac.pop;
-                });
-    }
-};
 
 enum class infrastructure_id { farm, well };
 

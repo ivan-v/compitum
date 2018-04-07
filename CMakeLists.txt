@@ -10,6 +10,7 @@ include_directories(compitum
 
 add_executable(main
     main.cpp
+    population.cpp
     trade_good.cpp
     )
 

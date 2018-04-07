@@ -1,6 +1,8 @@
 #ifndef FACTION_INCLUDED
 #define FACTION_INCLUDED
 
+#include <map>
+
 #include "trade_good.hpp"
 
 enum class faction_id {
