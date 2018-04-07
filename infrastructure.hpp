@@ -3,7 +3,6 @@
 
 #include "trade_good.hpp"
 
-#include <array>
 #include <ostream>
 
 enum class infrastructure_id { farm, well };

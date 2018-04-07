@@ -1,7 +1,6 @@
 #ifndef TRADE_GOOD_INCLUDED
 #define TRADE_GOOD_INCLUDED
 
-#include <array>
 #include <map>
 #include <ostream>
 #include <string>

@@ -4,14 +4,11 @@
 #include "trade_good.hpp"
 #include "region.hpp"
 
-#include <algorithm>
-#include <array>
 #include <chrono>
 #include <cmath>
 #include <iostream>
-#include <thread>
-#include <vector>
 #include <string>
+#include <thread>
 
 using namespace std::literals;
 

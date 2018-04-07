@@ -3,6 +3,7 @@
 
 #include "trade_good.hpp"
 
+#include <array>
 #include <map>
 
 enum class faction_id {
