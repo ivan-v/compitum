@@ -19,18 +19,20 @@ struct region {
     int provincial_production_value;
     double goods_produced_mod;
     population pop;
-    trade_good food, water;
+    trade_good_amount_map trade_good_amounts;
     std::vector<infrastructure> infras;
 };
 
 std::ostream& operator<<(std::ostream& out, region const& value) {
-    return out
-        <<   "Provincial production value: " << value.provincial_production_value
+    out << "Provincial production value: " << value.provincial_production_value
         << "\nGoods produced mod:          " << value.goods_produced_mod
-        << "\nPopulation:                  " << value.pop.total()
-        << "\nFood:                        " << value.food
-        << "\nWater:                       " << value.water;
-    //  << "\nBuildings:                   " << value.infras;
+        << "\nPopulation:                  " << value.pop.total();
+    for (auto [id, amount] : value.trade_good_amounts)
+        out << "\n"
+            << std::setw(29) << std::left
+            << (to_string(id) + ":") << amount;
+    // out << "\nBuildings:                   " << value.infras;
+    return out;
 }
 
 struct collect_infra_result {
@@ -69,15 +71,13 @@ int region_net_trade_prod(region const& reg, trade_good_id product) {
     return net_supply;
 }
 
-// TODO (urgent): replace food.price_const with whatever product is in the
-//                param
 int regional_trade_good_price(region const& reg, trade_good_id product){
     auto goods_produced = region_trade_prod(reg, product);
     auto local_demand = reg.pop.total();
     auto price = std::max(
         static_cast<double>(std::abs(local_demand))
             / goods_produced
-            * get_price_constant(reg.food.id),
+            * get_price_constant(product),
         1.0);
     return static_cast<int>(std::round(price));        
 }
@@ -112,11 +112,13 @@ region starve_turn_tick(region reg) {
         << regional_trade_good_price(reg, trade_good_id::food)
         << '\n';
 
+    // Update food amount
     int food_produced = region_trade_prod(reg, trade_good_id::food);
-    reg.food.amount += food_produced;
+    int& food_amount = reg.trade_good_amounts[trade_good_id::food];
+    food_amount += food_produced;
     int old_total = reg.pop.total();
-    if (reg.food.amount < 0) {
-        reg.pop = kill_people(reg.pop, -reg.food.amount);
+    if (food_amount < 0) {
+        reg.pop = kill_people(reg.pop, -food_amount);
         int const starved = old_total - reg.pop.total();
         std::cout
             << "The people starve!\n"
@@ -127,15 +129,19 @@ region starve_turn_tick(region reg) {
             << "A surplus of " << food_produced
             << " food has been produced.\n";  
     }
-    reg.water.amount += region_trade_prod(reg, trade_good_id::water);
-    if (reg.water.amount < 0) {
+
+    // Update water amount
+    int& water_amount = reg.trade_good_amounts[trade_good_id::water];
+    water_amount += region_trade_prod(reg, trade_good_id::water);
+    if (water_amount < 0) {
         int old_total = reg.pop.total();
-        reg.pop = kill_people(reg.pop, -reg.water.amount);
+        reg.pop = kill_people(reg.pop, -water_amount);
         int const starved = old_total - reg.pop.total();
         std::cout
             << "The people die of thirst!\n"
             << starved << " people have died.\n";
     }
+
     return reg;
 }
 
@@ -209,8 +215,8 @@ struct world {
 };
 
 int main() {
-    print_slow("Welcome, player 1. Welcome...");
-    wait(1000);
+    //print_slow("Welcome, player 1. Welcome...");
+    //wait(1000);
 
     region reg1 {
         30,         // provincial production value
@@ -226,9 +232,11 @@ int main() {
                 { faction_id::prostitutes, { 0, 10, {} } },
             }
         },
-        { trade_good_id::food, 10 },    // goods: price constant, amount
-        { trade_good_id::water, 10 },
-        { farm, well },                 // infrastructures
+        {
+            { trade_good_id::food, 10 },    // goods: price constant, amount
+            { trade_good_id::water, 10 },
+        },
+        { farm, well },                     // infrastructures
     };
 
     world w {

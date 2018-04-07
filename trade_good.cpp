@@ -26,6 +26,8 @@ int get_price_constant(trade_good_id id) {
     return 0;
 }
 
-std::ostream& operator<<(std::ostream& out, trade_good const& value) {
-    return out << value.amount << " units of " << to_string(value.id);
+std::ostream& operator<<(
+        std::ostream& out,
+        trade_good_amount_map::value_type const& value) {
+    return out << value.second << " units of " << to_string(value.first);
 }

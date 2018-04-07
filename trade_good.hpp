@@ -2,6 +2,7 @@
 #define TRADE_GOOD_INCLUDED
 
 #include <array>
+#include <map>
 #include <ostream>
 #include <string>
 
@@ -19,11 +20,10 @@ std::string to_string(trade_good_id);
 
 int get_price_constant(trade_good_id);
 
-struct trade_good {
-    trade_good_id id;
-    int amount;
-};
+using trade_good_amount_map = std::map<trade_good_id, int>;
 
-std::ostream& operator<<(std::ostream&, trade_good const&);
+std::ostream& operator<<(
+        std::ostream&,
+        trade_good_amount_map::value_type const&);
 
 #endif
