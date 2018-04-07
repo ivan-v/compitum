@@ -111,13 +111,7 @@ population kill_people(population pop, int count) {
     return pop;
 }
 
-region starve_turn_tick(region reg) {
-    std::cout
-        << "Regional price of food: "
-        << get_price(reg, trade_good_id::food)
-        << '\n';
-
-    // Update food amount
+region update_food_amount(region reg) {
     int food_produced = gross_production(reg, trade_good_id::food);
     int& food_amount = reg.trade_good_amounts[trade_good_id::food];
     food_amount += food_produced;
@@ -134,8 +128,10 @@ region starve_turn_tick(region reg) {
             << "A surplus of " << food_produced
             << " food has been produced.\n";  
     }
+    return reg;
+}
 
-    // Update water amount
+region update_water_amount(region reg) {
     int& water_amount = reg.trade_good_amounts[trade_good_id::water];
     water_amount += gross_production(reg, trade_good_id::water);
     if (water_amount < 0) {
@@ -146,7 +142,16 @@ region starve_turn_tick(region reg) {
             << "The people die of thirst!\n"
             << starved << " people have died.\n";
     }
+    return reg;
+}
 
+region starve_turn_tick(region reg) {
+    std::cout
+        << "Regional price of food: "
+        << get_price(reg, trade_good_id::food)
+        << '\n';
+    reg = update_food_amount(reg);
+    reg = update_water_amount(reg);
     return reg;
 }
 
