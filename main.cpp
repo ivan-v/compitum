@@ -53,7 +53,7 @@ collect_infra_result collect_infra(
     return result;
 }
 
-int region_trade_prod(region const& reg, trade_good_id product) {
+int gross_production(region const& reg, trade_good_id product) {
     auto infra = collect_infra(reg.infras, product);
     auto goods_produced = reg.provincial_production_value 
                         * reg.goods_produced_mod
@@ -62,16 +62,16 @@ int region_trade_prod(region const& reg, trade_good_id product) {
     return static_cast<int>(std::round(goods_produced));
 }
 
-int region_net_trade_prod(region const& reg, trade_good_id product) {
-    auto goods_produced = region_trade_prod(reg, product);
+int net_production(region const& reg, trade_good_id product) {
+    auto goods_produced = gross_production(reg, product);
     auto local_demand = reg.pop.total();
     auto net_supply =
         static_cast<int>(std::round(goods_produced - local_demand));
     return net_supply;
 }
 
-int regional_trade_good_price(region const& reg, trade_good_id product){
-    auto goods_produced = region_trade_prod(reg, product);
+int get_price(region const& reg, trade_good_id product){
+    auto goods_produced = gross_production(reg, product);
     auto local_demand = reg.pop.total();
     auto constant = get_price_constant(product);
     auto price = std::max(
@@ -81,7 +81,7 @@ int regional_trade_good_price(region const& reg, trade_good_id product){
 }
 
 int wealth_change_of_farmers(region const& reg){
-    return regional_trade_good_price(reg, trade_good_id::food)-2;
+    return get_price(reg, trade_good_id::food)-2;
 }
 
 // double tax_farmers(region const& reg, double tax_rate){
@@ -107,11 +107,11 @@ population kill_people(population pop, int count) {
 region starve_turn_tick(region reg) {
     std::cout
         << "Regional price of food: "
-        << regional_trade_good_price(reg, trade_good_id::food)
+        << get_price(reg, trade_good_id::food)
         << '\n';
 
     // Update food amount
-    int food_produced = region_trade_prod(reg, trade_good_id::food);
+    int food_produced = gross_production(reg, trade_good_id::food);
     int& food_amount = reg.trade_good_amounts[trade_good_id::food];
     food_amount += food_produced;
     int old_total = reg.pop.total();
@@ -130,7 +130,7 @@ region starve_turn_tick(region reg) {
 
     // Update water amount
     int& water_amount = reg.trade_good_amounts[trade_good_id::water];
-    water_amount += region_trade_prod(reg, trade_good_id::water);
+    water_amount += gross_production(reg, trade_good_id::water);
     if (water_amount < 0) {
         int old_total = reg.pop.total();
         reg.pop = kill_people(reg.pop, -water_amount);
