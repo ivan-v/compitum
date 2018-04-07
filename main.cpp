@@ -54,12 +54,11 @@ collect_infra_result collect_infra(
 }
 
 int region_trade_prod(region const& reg, trade_good_id product) {
-    auto [base_production, production_modifier] =
-        collect_infra(reg.infras, product);
+    auto infra = collect_infra(reg.infras, product);
     auto goods_produced = reg.provincial_production_value 
                         * reg.goods_produced_mod
-                        * production_modifier 
-                        + base_production;
+                        * infra.production_modifier 
+                        + infra.base_production;
     return static_cast<int>(std::round(goods_produced));
 }
 
