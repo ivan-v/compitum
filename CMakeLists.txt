@@ -9,6 +9,7 @@ include_directories(compitum
     PRIVATE ${PROJECT_SOURCE_DIR})
 
 add_executable(main
+    infrastructure.cpp
     main.cpp
     population.cpp
     trade_good.cpp
