@@ -1,13 +1,12 @@
 #include <algorithm>
 #include <array>
+#include <chrono>   
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <thread>
 #include <vector>
 #include <string>
-
-#include <thread>
-#include <chrono>   
 
 #include "faction.hpp"
 #include "infrastructure.hpp"
