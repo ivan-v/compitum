@@ -1,8 +1,8 @@
 #ifndef COMPITUM_REGION_INCLUDED
 #define COMPITUM_REGION_INCLUDED
 
-#include "infrastructure.hpp"
-#include "population.hpp"
+#include "compitum/infrastructure.hpp"
+#include "compitum/population.hpp"
 
 #include <vector>
 

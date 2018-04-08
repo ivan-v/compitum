@@ -1,4 +1,4 @@
-#include "infrastructure.hpp"
+#include "compitum/infrastructure.hpp"
 
 std::ostream& compitum::operator<<(
         std::ostream& out,

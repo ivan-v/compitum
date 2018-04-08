@@ -9,12 +9,12 @@ include_directories(compitum
     PRIVATE ${PROJECT_SOURCE_DIR})
 
 add_executable(main
-    infrastructure.cpp
-    interactor.cpp
-    main.cpp
-    population.cpp
-    region.cpp
-    trade_good.cpp
+    compitum/infrastructure.cpp
+    compitum/interactor.cpp
+    compitum/main.cpp
+    compitum/population.cpp
+    compitum/region.cpp
+    compitum/trade_good.cpp
     )
 
 if(MSVC)

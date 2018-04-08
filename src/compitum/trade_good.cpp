@@ -1,4 +1,4 @@
-#include "trade_good.hpp"
+#include "compitum/trade_good.hpp"
 
 #include <cassert>
  

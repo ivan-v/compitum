@@ -1,7 +1,7 @@
 #ifndef COMPITUM_POPULATION_INCLUDED
 #define COMPITUM_POPULATION_INCLUDED
 
-#include "faction.hpp"
+#include "compitum/faction.hpp"
 
 #include <map>
 

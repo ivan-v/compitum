@@ -1,9 +1,9 @@
-#include "faction.hpp"
-#include "infrastructure.hpp"
-#include "interactor.hpp"
-#include "population.hpp"
-#include "trade_good.hpp"
-#include "region.hpp"
+#include "compitum/faction.hpp"
+#include "compitum/infrastructure.hpp"
+#include "compitum/interactor.hpp"
+#include "compitum/population.hpp"
+#include "compitum/region.hpp"
+#include "compitum/trade_good.hpp"
 
 #include <cassert>
 #include <chrono>
@@ -208,7 +208,7 @@ int main(int argc, char** argv) try {
     interactor io{std::cin, std::cout, config.io};
 
     io.print_slow("Welcome, player 1. Welcome...");
-    sleep_for(config.io.long_delay * 4);
+    sleep_for(config.io.long_delay * 3);
 
     region reg1 {
         30,         // provincial production value

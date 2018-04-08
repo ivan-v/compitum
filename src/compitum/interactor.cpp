@@ -1,4 +1,4 @@
-#include "interactor.hpp"
+#include "compitum/interactor.hpp"
 
 #include <thread>
 

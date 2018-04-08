@@ -1,7 +1,7 @@
 #ifndef COMPITUM_INFRASTRUCTURE_INCLUDED
 #define COMPITUM_INFRASTRUCTURE_INCLUDED
 
-#include "trade_good.hpp"
+#include "compitum/trade_good.hpp"
 
 #include <ostream>
 

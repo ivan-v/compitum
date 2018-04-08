@@ -1,7 +1,7 @@
 #ifndef COMPITUM_FACTION_INCLUDED
 #define COMPITUM_FACTION_INCLUDED
 
-#include "trade_good.hpp"
+#include "compitum/trade_good.hpp"
 
 #include <array>
 #include <map>
