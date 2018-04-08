@@ -10,6 +10,7 @@ include_directories(compitum
 
 add_executable(main
     infrastructure.cpp
+    interactor.cpp
     main.cpp
     population.cpp
     region.cpp

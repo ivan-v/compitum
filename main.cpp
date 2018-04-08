@@ -1,5 +1,6 @@
 #include "faction.hpp"
 #include "infrastructure.hpp"
+#include "interactor.hpp"
 #include "population.hpp"
 #include "trade_good.hpp"
 #include "region.hpp"
@@ -15,32 +16,6 @@ using namespace std::literals;
 
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
-
-struct interactor {
-    std::istream& in;
-    std::ostream& out;
-
-    struct configuration {
-        milliseconds short_delay = 125ms;
-        milliseconds long_delay  = 350ms;
-    } config;
-
-    void print_slow(std::string const&);
-};
-
-void interactor::print_slow(std::string const& text) {
-    for (char c : text){
-        out << c << std::flush;
-        sleep_for(c == '.' ? config.long_delay : config.short_delay);
-    }
-    out << "\n";
-}
-
-template <class T>
-interactor& operator<<(interactor& io, T const& x) {
-    io.out << x;
-    return io;
-}
 
 int wealth_change_of_farmers(region const& reg){
     return get_price(reg, trade_good_id::food) - 2;
@@ -138,7 +113,8 @@ std::string get_month_name(int month) {
         case 11: return "November";
         case 12: return "December";
     }
-    return "-1";
+    assert(false);
+    return "month{" + std::to_string(month) + "}";
 }
 
 void print(interactor& io, world_time t) {
