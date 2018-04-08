@@ -2,6 +2,8 @@
 
 #include <numeric>
 
+namespace compitum {
+
 int population::total() const {
     return std::accumulate(
             begin(factions), end(factions),
@@ -10,4 +12,6 @@ int population::total() const {
                 faction const& fac = item.second;
                 return acc + fac.pop;
             });
+}
+
 }

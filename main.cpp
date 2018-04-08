@@ -12,6 +12,7 @@
 #include <string>
 #include <thread>
 
+using namespace compitum;
 using namespace std::literals;
 
 using std::chrono::milliseconds;

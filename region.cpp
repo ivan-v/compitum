@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iomanip>
 
+namespace compitum {
 namespace {
 
 struct collect_infra_result {
@@ -24,8 +25,9 @@ static collect_infra_result collect_infra(
 }
 
 }
+}
 
-std::ostream& operator<<(std::ostream& out, region const& value) {
+std::ostream& compitum::operator<<(std::ostream& out, region const& value) {
     out << "Provincial production value: " << value.provincial_production_value
         << "\nGoods produced mod:          " << value.goods_produced_mod
         << "\nPopulation:                  " << value.pop.total();
@@ -37,7 +39,7 @@ std::ostream& operator<<(std::ostream& out, region const& value) {
     return out;
 }
 
-int gross_production(region const& reg, trade_good_id product) {
+int compitum::gross_production(region const& reg, trade_good_id product) {
     auto infra = collect_infra(reg.infras, product);
     auto goods_produced = reg.provincial_production_value
                         * reg.goods_produced_mod
@@ -46,7 +48,7 @@ int gross_production(region const& reg, trade_good_id product) {
     return static_cast<int>(std::round(goods_produced));
 }
 
-int net_production(region const& reg, trade_good_id product) {
+int compitum::net_production(region const& reg, trade_good_id product) {
     auto goods_produced = gross_production(reg, product);
     auto local_demand = reg.pop.total();
     auto net_supply =
@@ -54,7 +56,7 @@ int net_production(region const& reg, trade_good_id product) {
     return net_supply;
 }
 
-int get_price(region const& reg, trade_good_id product){
+int compitum::get_price(region const& reg, trade_good_id product){
     auto goods_produced = gross_production(reg, product);
     auto local_demand = reg.pop.total();
     auto constant = get_price_constant(product);

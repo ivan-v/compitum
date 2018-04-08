@@ -1,10 +1,12 @@
-#ifndef FACTION_INCLUDED
-#define FACTION_INCLUDED
+#ifndef COMPITUM_FACTION_INCLUDED
+#define COMPITUM_FACTION_INCLUDED
 
 #include "trade_good.hpp"
 
 #include <array>
 #include <map>
+
+namespace compitum {
 
 enum class faction_id {
     bandits,
@@ -28,5 +30,7 @@ struct faction {
         trade_good_id::water
     }};
 };
+
+}
 
 #endif

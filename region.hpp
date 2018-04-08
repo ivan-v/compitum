@@ -1,10 +1,12 @@
-#ifndef REGION_INCLUDED
-#define REGION_INCLUDED
+#ifndef COMPITUM_REGION_INCLUDED
+#define COMPITUM_REGION_INCLUDED
 
 #include "infrastructure.hpp"
 #include "population.hpp"
 
 #include <vector>
+
+namespace compitum {
 
 struct region {
     // pop = population
@@ -22,5 +24,7 @@ int gross_production(region const&, trade_good_id);
 int net_production(region const&, trade_good_id);
 
 int get_price(region const&, trade_good_id);
+
+}
 
 #endif
