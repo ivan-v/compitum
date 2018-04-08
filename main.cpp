@@ -5,6 +5,7 @@
 #include "trade_good.hpp"
 #include "region.hpp"
 
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <iostream>
