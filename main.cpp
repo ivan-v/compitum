@@ -123,7 +123,7 @@ std::string get_month_name(int month) {
     return "-1";
 }
 
-void print_world_time(world_time t) {
+void print(world_time t) {
     std::string minute_string =
         (t.minute < 10 ? "0" : "") + std::to_string(t.minute);
     std::cout
@@ -146,6 +146,10 @@ struct world {
     region reg1; // TODO: Make vector of regions
     world_time t1;
 };
+
+bool is_quit(std::string const& line) {
+    return !line.empty() && line.front() == 'q';
+}
 
 int main() {
     print_slow("Welcome, player 1. Welcome...");
@@ -177,11 +181,20 @@ int main() {
         {1352, 1, 2, 3, 4},
     };
 
-    std::cout << reg1 << "\n";
+    auto prompt = [&] {
+        print(w.t1);
+        std::cout << reg1 << "\n";
+        std::cout << "Press Enter to simulate the next state, or type quit.\n";
+    };
 
-    print_world_time(w.t1);
-
-    reg1 = simulate_turn(reg1);
-
-    std::cout << reg1 << "\n";
+    prompt();
+    for (std::string line; getline(std::cin, line) && !is_quit(line);) {
+        if (line.empty()) {
+            reg1 = simulate_turn(reg1);
+            prompt();
+        } else {
+            std::cout << "bad input: " << line;
+        }
+    }
+    std::cout << "Goodbye!\n";
 }
