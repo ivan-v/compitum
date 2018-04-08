@@ -7,19 +7,9 @@
 
 namespace compitum {
 
-using namespace std::literals;
-
-using std::chrono::milliseconds;
-
 struct interactor {
     std::istream& in;
     std::ostream& out;
-
-    struct configuration {
-       milliseconds
-            short_delay = 125ms,
-            long_delay  = 350ms;
-    } config;
 
     void print_slow(std::string const&) const;
 };

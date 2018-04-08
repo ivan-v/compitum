@@ -1,5 +1,7 @@
 #include "compitum/interactor.hpp"
 
+#include "compitum/config.hpp"
+
 #include <thread>
 
 using std::this_thread::sleep_for;

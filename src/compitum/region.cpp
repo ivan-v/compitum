@@ -3,13 +3,16 @@
 #include <cmath>
 #include <iomanip>
 
-namespace compitum {
+using namespace compitum;
+
 namespace {
 
-struct collect_infra_result {
-    int base_production;
-    double production_modifier;
-};
+    struct collect_infra_result {
+        int base_production;
+        double production_modifier;
+    };
+
+}
 
 static collect_infra_result collect_infra(
         std::vector<infrastructure> const& infras,
@@ -22,9 +25,6 @@ static collect_infra_result collect_infra(
         }
     }
     return result;
-}
-
-}
 }
 
 std::ostream& compitum::operator<<(std::ostream& out, region const& value) {
