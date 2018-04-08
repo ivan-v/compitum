@@ -1,17 +1,22 @@
 #include "faction.hpp"
 #include "infrastructure.hpp"
+#include "interactor.hpp"
 #include "population.hpp"
 #include "trade_good.hpp"
 #include "region.hpp"
 
+#include <cassert>
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <thread>
 
+using namespace compitum;
 using namespace std::literals;
 
+using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 
 int wealth_change_of_farmers(region const& reg){
@@ -87,16 +92,6 @@ region simulate_turn(region reg) {
     return reg;
 }
 
-void print_slow(std::string text){
-    for (char& c : text){
-        std::cout << c << std::flush;
-        sleep_for(125ms);
-        if (c == '.')
-            sleep_for(225ms);
-    }
-    std::cout << "\n";
-}
-
 struct world_time {
     int year;
     int month;  // 1 through 12
@@ -120,14 +115,14 @@ std::string get_month_name(int month) {
         case 11: return "November";
         case 12: return "December";
     }
-    return "-1";
+    assert(false);
+    return "month{" + std::to_string(month) + "}";
 }
 
-void print(world_time t) {
+void print(interactor& io, world_time t) {
     std::string minute_string =
         (t.minute < 10 ? "0" : "") + std::to_string(t.minute);
-    std::cout
-        << t.hour << ":" << minute_string
+    io  << t.hour << ":" << minute_string
         << " on " << get_month_name(t.month)
         << " " << t.day
         << ", the year of our lord " << t.year
@@ -151,9 +146,69 @@ bool is_quit(std::string const& line) {
     return !line.empty() && line.front() == 'q';
 }
 
-int main() {
-    print_slow("Welcome, player 1. Welcome...");
-    sleep_for(1s);
+struct configuration {
+    interactor::configuration io;
+};
+
+void throw_runtime(std::string const& what) {
+    throw std::runtime_error(what);
+}
+
+#include <fstream>
+#include <sstream>
+
+struct config_entry {
+    std::string key, value;
+};
+
+config_entry parse_entry(std::string const& line) {
+    std::istringstream parse(line);
+    std::string key, eq, value_head, value_tail;
+    if (!(parse >> key >> eq >> value_head))
+        throw_runtime("config: unexpected end of file");
+    if (eq != "=")
+        throw_runtime("config: expected '=', not " + eq);
+    getline(parse, value_tail);
+    return {key, value_head + value_tail};
+}
+
+void load_config(std::istream& in, configuration& config) {
+    for (std::string line; getline(in, line);) {
+        if (line.empty() || line.front() == '#') continue;
+        auto [key, value] = parse_entry(line);
+        if (key == "io.short_delay.milliseconds")
+            config.io.short_delay = milliseconds(stoi(value));
+        else if (key == "io.long_delay.milliseconds")
+            config.io.long_delay = milliseconds(stoi(value));
+        else
+            throw_runtime("config: bad key: " + key);
+    }
+}
+
+void load_config_file(std::string const& path, configuration& config) {
+    std::ifstream in(path);
+    if (!in) throw_runtime("config: cannot read " + path);
+    load_config(in, config);
+}
+
+configuration parse_args(int /* argc */, char** argv) {
+    configuration config;
+    while (auto arg = *++argv) {
+        if (arg == "--config"s) {
+            if (!(arg = *++argv))
+                throw_runtime("parse_args: --config requires an argument");
+            load_config_file(*argv, config);
+        }
+    }
+    return config;
+}
+
+int main(int argc, char** argv) try {
+    configuration config = parse_args(argc, argv);
+    interactor io{std::cin, std::cout, config.io};
+
+    io.print_slow("Welcome, player 1. Welcome...");
+    sleep_for(config.io.long_delay * 4);
 
     region reg1 {
         30,         // provincial production value
@@ -182,9 +237,8 @@ int main() {
     };
 
     auto prompt = [&] {
-        print(w.t1);
-        std::cout << reg1 << "\n";
-        std::cout << "Press Enter to simulate the next state, or type quit.\n";
+        print(io, w.t1);
+        io << reg1 << "\nEnter blank line or quit.\n";
     };
 
     prompt();
@@ -197,4 +251,7 @@ int main() {
         }
     }
     std::cout << "Goodbye!\n";
+} catch (std::exception const& err) {
+    std::clog << "error: " << err.what() << '\n';
+    return 1;
 }
