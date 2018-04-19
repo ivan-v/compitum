@@ -160,12 +160,85 @@ void parse_args(int /* argc */, char** argv) {
     }
 }
 
+
+struct character {
+    std::string character_name;
+    int stamina;
+    int hit_points;
+    bool alive;
+};
+
+void set_hp(character c, int p) {
+    c.hit_points = p;
+}
+
+void hp_drain(character c, int p) {
+    c.hit_points -= p;
+    if (c.hit_points < 0)
+        c.alive = false;
+}
+
+void hp_recovery(character c, int p) {
+    c.hit_points += p;
+}
+
+void set_stamina(character c, int p) {
+    c.stamina = p;
+}
+
+void stamina_drain(character c, int p) {
+    c.stamina -= p;
+}
+
+void stamina_recovery(character c, int p) {
+    c.stamina += p;
+}
+
+void attempt_strike(character c, int damage_directed) {
+    hp_drain(c, damage_directed);
+}
+
+bool player_attack() {
+    std::string input;
+    std::cin >> input;
+    if (input == "strike")
+        return true;
+    else 
+        return false;
+}
+
+
 int main(int argc, char** argv) try {
     parse_args(argc, argv);
     interactor io{std::cin, std::cout};
 
     io.print_slow("Welcome, player 1. Welcome...");
     sleep_for(config.long_delay * 3);
+
+    character c1 {
+        "c1", 10, 10, true
+    };
+
+    character c2 {
+        "c2", 10, 10, true
+    };
+
+    std::cout << "Encounter began. \n";
+    while (c1.alive && c2.alive) {
+        std::cout << "Attack! \n";
+        if (player_attack()) {
+            stamina_drain(c1, 5);
+            //c2.hit_points -= 5; this works 
+            attempt_strike(c2, 5); //this should work as above, and be able to change
+                                   //the alive bool value, but doesn't.
+            std::cout << "The enemy is at " << c2.hit_points << " health! \n";
+        }
+        if (!c2.alive) {
+            io.print_slow("You have slain the enemy!");
+            io.print_slow("He had a wife and child, you monster...");
+        }
+    }
+
 
     region reg1 {
         30,         // provincial production value
