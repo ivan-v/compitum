@@ -248,22 +248,20 @@ int main(int argc, char** argv) try {
         //TODO: call a wait function here
         std::cout << "Attack fast, strike true! \n";
         int player_command = player_action(2000);
+
         if (player_command == 1) {
             stamina_drain(c1, 5);
             //c2.hit_points -= 5; this works 
             attempt_strike(c2, 5); //this should work as above, and be able to change
                                    //the alive bool value, but doesn't.
             std::cout << "The enemy is at " << c2.hp << " health! \n";
-        }
-        else if (player_command == 2) {
+        } else if (player_command == 2) {
             hp_recovery(c1, 5);
             std::cout << "You healed yourself to " << c1.hp << " health! \n";      
-        }
-        else if (player_command == 3) {
+        } else if (player_command == 3) {
             io.print_slow("Being the coward that you are, you flee...");
-            break;      
-        }
-        else
+            break; //Bad?
+        } else
             std::cout<< "Command unrecognized! \n";
     }
         if (!c1.alive) {
