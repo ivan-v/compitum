@@ -164,22 +164,26 @@ void parse_args(int /* argc */, char** argv) {
 struct character {
     std::string character_name;
     int stamina;
-    int hit_points;
+    int max_stamina;
+    int hp;
+    int max_hp;
     bool alive;
 };
 
 void set_hp(character c, int p) {
-    c.hit_points = p;
+    c.hp = p;
 }
 
-void hp_drain(character c, int p) {
-    c.hit_points -= p;
-    if (c.hit_points < 0)
+void hp_drain(character c, int p) { //sometihng isn't right here
+    c.hp -= p;
+    if (c.hp < 0)
         c.alive = false;
 }
 
-void hp_recovery(character c, int p) {
-    c.hit_points += p;
+void hp_recovery(character c, int p) { //sometihng isn't right here
+    if ((c.hp + p) <= c.max_hp)
+        c.hp += p; 
+    else c.hp = c.max_hp;
 }
 
 void set_stamina(character c, int p) {
@@ -187,24 +191,36 @@ void set_stamina(character c, int p) {
 }
 
 void stamina_drain(character c, int p) {
-    c.stamina -= p;
+    if ((c.stamina - p) >= 0)
+        c.stamina -= p;
+    else c.stamina = 0;
 }
 
 void stamina_recovery(character c, int p) {
-    c.stamina += p;
+    if ((c.stamina + p) <= c.max_stamina)
+        c.stamina += p;
+    else c.stamina = c.max_stamina;
 }
 
 void attempt_strike(character c, int damage_directed) {
     hp_drain(c, damage_directed);
 }
 
-bool player_attack() {
+//player must type in attack quickly enough
+int player_action(int milliseconds_allowed) {
     std::string input;
+    auto start = std::chrono::steady_clock::now();
     std::cin >> input;
-    if (input == "strike")
-        return true;
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::steady_clock::now( ) - start);
+    if (input == "strike"  && elapsed.count() < milliseconds_allowed)
+        return 1;
+    else if (input == "heal"  && elapsed.count() < milliseconds_allowed)
+        return 2;
+    else if (input == "flee"  && elapsed.count() < milliseconds_allowed)
+        return 3;
     else 
-        return false;
+        return 0;
 }
 
 
@@ -216,28 +232,48 @@ int main(int argc, char** argv) try {
     sleep_for(config.long_delay * 3);
 
     character c1 {
-        "c1", 10, 10, true
+        "c1", 10, 10, 10, 20, true
     };
 
     character c2 {
-        "c2", 10, 10, true
+        "c2", 10, 10, 10, 20, true
     };
 
     std::cout << "Encounter began. \n";
+    io.print_slow("Hint: type 'strike' or 'heal' quickly.");
+
+    int difficulty_speed = 2000; //TODO: make configurable
+
     while (c1.alive && c2.alive) {
-        std::cout << "Attack! \n";
-        if (player_attack()) {
+        //TODO: call a wait function here
+        std::cout << "Attack fast, strike true! \n";
+        int player_command = player_action(2000);
+        if (player_command == 1) {
             stamina_drain(c1, 5);
             //c2.hit_points -= 5; this works 
             attempt_strike(c2, 5); //this should work as above, and be able to change
                                    //the alive bool value, but doesn't.
-            std::cout << "The enemy is at " << c2.hit_points << " health! \n";
+            std::cout << "The enemy is at " << c2.hp << " health! \n";
         }
+        else if (player_command == 2) {
+            hp_recovery(c1, 5);
+            std::cout << "You healed yourself to " << c1.hp << " health! \n";      
+        }
+        else if (player_command == 3) {
+            io.print_slow("Being the coward that you are, you flee...");
+            break;      
+        }
+        else
+            std::cout<< "Command unrecognized! \n";
+    }
+        if (!c1.alive) {
+            io.print_slow("You have died!");
+        }
+
         if (!c2.alive) {
             io.print_slow("You have slain the enemy!");
             io.print_slow("He had a wife and child, you monster...");
         }
-    }
 
 
     region reg1 {
