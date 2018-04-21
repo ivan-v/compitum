@@ -7,7 +7,7 @@
 
 namespace compitum {
 
-enum class infrastructure_id { farm, well };
+enum class infrastructure_id { farm, well, tavern };
 
 struct infrastructure {
     infrastructure_id id;
@@ -22,7 +22,8 @@ std::ostream& operator<<(std::ostream&, infrastructure const&);
 
 constexpr infrastructure
     farm{ infrastructure_id::farm, trade_good_id::food, 15, 1.05, 0 },
-    well{ infrastructure_id::well, trade_good_id::water, 40, 1.00, 0 };
+    well{ infrastructure_id::well, trade_good_id::water, 40, 1.00, 0 },
+    tavern{ infrastructure_id::tavern, trade_good_id::groschen, 100, 1.00, 50 };
 
 }
 

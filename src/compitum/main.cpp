@@ -205,8 +205,14 @@ void replenish_stamina(character& c, int p) {
     else c.stamina = c.max_stamina;
 }
 
-void attempt_strike(character& c, int damage_directed) {
-    drain_hp(c, damage_directed);
+//TODO: make distance and probability
+void attempt_strike(character& target, int damage_directed) {
+    drain_hp(target, damage_directed);
+}
+
+void unarmed_strike(character& self, character& target) {
+    drain_stamina(self, 5);
+    attempt_strike(target, 2);
 }
 
 //player must type in attack quickly enough
@@ -216,29 +222,74 @@ int player_action(int milliseconds_allowed) {
     std::cin >> input;
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                                 std::chrono::steady_clock::now( ) - start);
-    if (input == "strike"  && elapsed.count() < milliseconds_allowed)
-        return 1;
-    else if (input == "heal"  && elapsed.count() < milliseconds_allowed)
-        return 2;
-    else if (input == "flee"  && elapsed.count() < milliseconds_allowed)
-        return 3;
+    if (elapsed.count() < milliseconds_allowed) {
+        if (input == "strike")
+            return 1;
+        else if (input == "heal")
+            return 2;
+        else if (input == "flee")
+            return 3;
+        else 
+            return -1; 
+    }
     else 
         return 0;
 }
 
-
 //TODO: make enemy action functions, such as different attacks
-void enemy_action(character self, character enemy) {
+void enemy_action(character& self, character& enemy) {
     if (self.hp < 10) {
         replenish_hp(self, 5);
         std::cout << self.character_name << " healed themselves to "
                   << self.hp << " health! \n";
     } else if (self.stamina >= 5) {
-        drain_stamina(self, 5);
-        attempt_strike(enemy, 4);
+        unarmed_strike(self, enemy);
         std::cout << self.character_name << " strikes "<< enemy.character_name 
                   << ", dealing "<< 4 << " damage! \n";
-    } else (replenish_stamina(self, 3));
+        std::cout << enemy.character_name << " has "<< enemy.hp 
+                  << " health left. \n";
+    } else 
+        replenish_stamina(self, 3);
+        std::cout << self.character_name << " repleninshes their stamina. \n";
+}
+
+
+void fight_encounter(character& player, character& enemy, int difficulty_speed) {
+    interactor io{std::cin, std::cout};
+
+    std::cout << "Encounter began. \n";
+    io.print_slow("Hint: type 'strike' or 'heal' quickly.");
+    
+    //TODO: calculate initiative, then determine who goes first
+    //if (enemy.initiative > player.initiative)
+
+    while (player.alive && enemy.alive) {
+        enemy_action(enemy, player);
+        sleep_for(config.long_delay * 2);
+        std::cout << "Attack fast, strike true! \n";
+        int player_command = player_action(2000);
+        if (player_command == -1) {
+            std::cout<< "Command unrecognized! \n";
+        } else if (player_command == 0) {
+            std::cout<< "You were too slow to react! \n";
+        } else if (player_command == 1) {
+            drain_stamina(player, 5);
+            attempt_strike(enemy, 5);
+            std::cout << "The enemy is at " << enemy.hp << " health! \n";
+        } else if (player_command == 2) {
+            replenish_hp(player, 5);
+            std::cout << "You healed yourself to " << player.hp << " health! \n";      
+        } else if (player_command == 3) {
+            io.print_slow("Being the coward that you are, you flee...");
+            break; //Bad?
+        }
+    }
+    if (!player.alive) {
+        io.print_slow("You have died!");
+    } if (!enemy.alive) {
+        io.print_slow("You have slain the enemy!");
+        io.print_slow("He had a wife and child, you monster...");
+    }
 }
 
 
@@ -258,41 +309,12 @@ int main(int argc, char** argv) try {
         "Magic Boar", 10, 10, 10, 20, true
     };
 
-    std::cout << "Encounter began. \n";
-    io.print_slow("Hint: type 'strike' or 'heal' quickly.");
-
     int difficulty_speed = 2000; //TODO: make configurable
 
-    while (c1.alive && c2.alive) {
-        enemy_action(c2, c1);
-        //TODO: call a wait function here
-        std::cout << "Attack fast, strike true! \n";
-        int player_command = player_action(2000);
-        if (player_command == 0) {
-            std::cout<< "You were too slow to react! \n";
-        } else if (player_command == 1) {
-            drain_stamina(c1, 5);
-            //c2.hit_points -= 5; this works 
-            attempt_strike(c2, 5); //this should work as above, and be able to change
-                                   //the alive bool value, but doesn't.
-            std::cout << "The enemy is at " << c2.hp << " health! \n";
-        } else if (player_command == 2) {
-            replenish_hp(c1, 5);
-            std::cout << "You healed yourself to " << c1.hp << " health! \n";      
-        } else if (player_command == 3) {
-            io.print_slow("Being the coward that you are, you flee...");
-            break; //Bad?
-        } else
-            std::cout<< "Command unrecognized! \n";
-    }
-        if (!c1.alive) {
-            io.print_slow("You have died!");
-        }
+    fight_encounter(c1, c2, difficulty_speed);
 
-        if (!c2.alive) {
-                io.print_slow("You have slain the enemy!");
-            io.print_slow("He had a wife and child, you monster...");
-        }
+
+    
 
 
     region reg1 {

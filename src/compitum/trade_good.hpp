@@ -7,7 +7,7 @@
 
 namespace compitum {
 
-enum class trade_good_id { food, water, wood, stone, marble };
+enum class trade_good_id { food, water, wood, stone, marble, groschen };
 
 std::string to_string(trade_good_id);
 
