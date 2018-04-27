@@ -1,3 +1,5 @@
+#include "compitum/character.hpp"
+#include "compitum/combat.hpp"
 #include "compitum/config.hpp"
 #include "compitum/faction.hpp"
 #include "compitum/infrastructure.hpp"
@@ -160,176 +162,64 @@ void parse_args(int /* argc */, char** argv) {
     }
 }
 
-
-struct character {
-    std::string character_name;
-    int stamina;
-    int max_stamina;
-    int hp;
-    int max_hp;
-    bool alive;
-};
-
-void set_hp(character& c, int p) {
-    c.hp = p;
-}
-
-void drain_hp(character& c, int p) {
-    c.hp -= p;
-    if (c.hp < 0)
-        c.alive = false;
-}
-
-void replenish_hp(character& c, int p) {
-    if ((c.hp + p) <= c.max_hp)
-        c.hp += p; 
-    else c.hp = c.max_hp;
-}
-
-void set_stamina(character& c, int p) {
-    c.stamina = p;
-}
-
-void drain_stamina(character& c, int p) {
-    c.stamina = c.stamina >= p ?
-    c.stamina - p : 0;
-
-    // if ((c.stamina - p) >= 0)
-    //     c.stamina -= p;
-    // else c.stamina = 0;
-}
-
-void replenish_stamina(character& c, int p) {
-    if ((c.stamina + p) <= c.max_stamina)
-        c.stamina += p;
-    else c.stamina = c.max_stamina;
-}
-
-int roll_die(int faces) {
-   return rand() % faces + 1;
-}
-
-//TODO: fix: sometimes returns 0
-int roll_dice(int faces, int times, int modifier) {
-    srand(time(0)); //TODO: fix conversion warning
-    int result = 0;
-    for(int i = 0; i < times; i++) {
-        result += roll_die(faces);
-    }
-    return result + modifier;
-}
-
-enum class combat_action_id { unarmed_strike, tusk };
-
-enum class damage_type { bludgeoning, piercing, slashing };
-
-struct combat_action {
-    combat_action_id id;
-    damage_type type;
-    int reach_distance; //in meters
-    int num_targets;
-    int stamina_cost;
-    int roll_dice_faces;
-    int roll_dice_times;
-    int roll_dice_modifier;
-};
-
-std::ostream& operator<<(std::ostream&, combat_action const&);
-
-constexpr combat_action
-    unarmed_strike{ combat_action_id::unarmed_strike, damage_type::bludgeoning, 1, 1, 5, 4, 1, 0 },
-    tusk{ combat_action_id::tusk, damage_type::slashing, 1, 1, 5, 6, 1, 1 };
-
-
-
-//TODO: make armor and defense checks
-int attempt_strike(character& self, character& target,
-                    combat_action attack, int distance_between_characters) {
-    if (attack.reach_distance >= distance_between_characters 
-                      && attack.stamina_cost <= self.stamina) {
-        drain_stamina(self, attack.stamina_cost);
-        int damage_dealt = roll_dice(attack.roll_dice_faces, 
-                                   attack.roll_dice_times, 
-                                   attack.roll_dice_modifier);
-        drain_hp(target, damage_dealt);
-        return damage_dealt;
-    }
-    return 0;
-}
-
-//player must type in attack quickly enough
-int player_action(int milliseconds_allowed) {
-    std::string input;
-    auto start = std::chrono::steady_clock::now();
-    std::cin >> input;
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                                std::chrono::steady_clock::now( ) - start);
-    if (elapsed.count() < milliseconds_allowed) {
-        if (input == "strike")
-            return 1;
-        else if (input == "heal")
-            return 2;
-        else if (input == "flee")
-            return 3;
-        else 
-            return -1; 
-    }
-    else 
-        return 0;
-}
-
-//TODO: make enemy action functions, such as different attacks
-void enemy_action(character& self, character& enemy, int distance_between_characters) {
-    if (self.hp < 10) {
-        replenish_hp(self, 5);
-        std::cout << self.character_name << " healed themselves to "
-                  << self.hp << " health! \n";
-    } else if (self.stamina >= 5) {
-        std::cout << self.character_name << " strikes "<< enemy.character_name 
-                  << ", dealing "<<  attempt_strike(self, enemy, tusk, distance_between_characters)
-                  << " damage! \n";
-        std::cout << enemy.character_name << " has "<< enemy.hp 
-                  << " health left. \n";
-    } else 
-        replenish_stamina(self, 3);
-        std::cout << self.character_name << " repleninshes their stamina. \n";
-}
-
-
-void fight_encounter(character& player, character& enemy, int difficulty_speed, int distance_between_characters) {
+void fight_encounter(character& player, character& enemy, int difficulty_speed,
+                                               int distance_between_characters) {
     interactor io{std::cin, std::cout};
 
     std::cout << "Encounter began. \n";
     io.print_slow("Hint: type 'strike' or 'heal' quickly.");
+    sleep_for(config.long_delay * 3);
     
     //TODO: calculate initiative, then determine who goes first
     //if (enemy.initiative > player.initiative)
-
-    while (player.alive && enemy.alive) {
-        enemy_action(enemy, player, distance_between_characters);
-        sleep_for(config.long_delay * 2);
+    int block = 0;
+    while (player.hp >= 0 && enemy.hp >= 0) {
+        sleep_for(config.long_delay * 3);
+        enemy_action(enemy, player, distance_between_characters, block);
+        block = 0;
+        sleep_for(config.long_delay * 6);
         std::cout << "Attack fast, strike true! \n";
         int player_command = player_action(2000);
         if (player_command == -1) {
             std::cout<< "Command unrecognized! \n";
             replenish_stamina(player, 8);
-            std::cout<< "Your stamina is now " << player.stamina << ". \n";
+            sleep_for(config.long_delay * 2);
+            std::cout << "Your stamina replenishes to " 
+                      << player.stamina << ". \n";
         } else if (player_command == 0) {
             std::cout<< "You were too slow to react! \n";
             replenish_stamina(player, 8);
             std::cout<< "Your stamina is now " << player.stamina << ". \n";
         } else if (player_command == 1) {
-            std::cout << player.character_name << " strikes "<< enemy.character_name 
-                  << ", dealing " <<  attempt_strike(player, enemy, unarmed_strike, 
-                                                        distance_between_characters)
-                  << " damage! \n";
-            std::cout << "The enemy is now at " << enemy.hp << " health! \n";
+            int strike = attempt_strike(player, enemy, unarmed_strike, 
+                                          distance_between_characters);
+            if (strike > 0) {
+                std::cout << player.character_name << " strikes " 
+                          << enemy.character_name << ", dealing " 
+                          <<  strike << " damage! \n";
+                std::cout << "The enemy is now at " << enemy.hp << " health! \n";
+            } else {
+                std::cout << "You don't have enough stamina to attack! \n";
+                replenish_stamina(player, 8);
+                std::cout<< "Your stamina replenishes to " << player.stamina 
+                         << ". \n";
+            }
         } else if (player_command == 2) {
             replenish_hp(player, 5);
             std::cout << "You healed yourself to " << player.hp << " health! \n";      
         } else if (player_command == 3) {
             io.print_slow("Being the coward that you are, you flee...");
             break; //Bad?
+        }
+        else if (player_command == 4) {
+            if (attempt_block(player) == 0) {
+                std::cout << "You don't have enough stamina to block. \n";
+                block = 0;
+                replenish_stamina(player, 8);
+                std::cout<< "Your stamina is now " << player.stamina << ". \n";
+            } else {
+                block = 1; 
+            }
         }
     }
     if (!player.alive) {
