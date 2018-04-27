@@ -205,14 +205,56 @@ void replenish_stamina(character& c, int p) {
     else c.stamina = c.max_stamina;
 }
 
-//TODO: make distance and probability
-void attempt_strike(character& target, int damage_directed) {
-    drain_hp(target, damage_directed);
+int roll_die(int faces) {
+   return rand() % faces + 1;
 }
 
-void unarmed_strike(character& self, character& target) {
-    drain_stamina(self, 5);
-    attempt_strike(target, 2);
+//TODO: fix: sometimes returns 0
+int roll_dice(int faces, int times, int modifier) {
+    srand(time(0)); //TODO: fix conversion warning
+    int result = 0;
+    for(int i = 0; i < times; i++) {
+        result += roll_die(faces);
+    }
+    return result + modifier;
+}
+
+enum class combat_action_id { unarmed_strike, tusk };
+
+enum class damage_type { bludgeoning, piercing, slashing };
+
+struct combat_action {
+    combat_action_id id;
+    damage_type type;
+    int reach_distance; //in meters
+    int num_targets;
+    int stamina_cost;
+    int roll_dice_faces;
+    int roll_dice_times;
+    int roll_dice_modifier;
+};
+
+std::ostream& operator<<(std::ostream&, combat_action const&);
+
+constexpr combat_action
+    unarmed_strike{ combat_action_id::unarmed_strike, damage_type::bludgeoning, 1, 1, 5, 4, 1, 0 },
+    tusk{ combat_action_id::tusk, damage_type::slashing, 1, 1, 5, 6, 1, 1 };
+
+
+
+//TODO: make armor and defense checks
+int attempt_strike(character& self, character& target,
+                    combat_action attack, int distance_between_characters) {
+    if (attack.reach_distance >= distance_between_characters 
+                      && attack.stamina_cost <= self.stamina) {
+        drain_stamina(self, attack.stamina_cost);
+        int damage_dealt = roll_dice(attack.roll_dice_faces, 
+                                   attack.roll_dice_times, 
+                                   attack.roll_dice_modifier);
+        drain_hp(target, damage_dealt);
+        return damage_dealt;
+    }
+    return 0;
 }
 
 //player must type in attack quickly enough
@@ -237,15 +279,15 @@ int player_action(int milliseconds_allowed) {
 }
 
 //TODO: make enemy action functions, such as different attacks
-void enemy_action(character& self, character& enemy) {
+void enemy_action(character& self, character& enemy, int distance_between_characters) {
     if (self.hp < 10) {
         replenish_hp(self, 5);
         std::cout << self.character_name << " healed themselves to "
                   << self.hp << " health! \n";
     } else if (self.stamina >= 5) {
-        unarmed_strike(self, enemy);
         std::cout << self.character_name << " strikes "<< enemy.character_name 
-                  << ", dealing "<< 4 << " damage! \n";
+                  << ", dealing "<<  attempt_strike(self, enemy, tusk, distance_between_characters)
+                  << " damage! \n";
         std::cout << enemy.character_name << " has "<< enemy.hp 
                   << " health left. \n";
     } else 
@@ -254,7 +296,7 @@ void enemy_action(character& self, character& enemy) {
 }
 
 
-void fight_encounter(character& player, character& enemy, int difficulty_speed) {
+void fight_encounter(character& player, character& enemy, int difficulty_speed, int distance_between_characters) {
     interactor io{std::cin, std::cout};
 
     std::cout << "Encounter began. \n";
@@ -264,18 +306,24 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed) 
     //if (enemy.initiative > player.initiative)
 
     while (player.alive && enemy.alive) {
-        enemy_action(enemy, player);
+        enemy_action(enemy, player, distance_between_characters);
         sleep_for(config.long_delay * 2);
         std::cout << "Attack fast, strike true! \n";
         int player_command = player_action(2000);
         if (player_command == -1) {
             std::cout<< "Command unrecognized! \n";
+            replenish_stamina(player, 8);
+            std::cout<< "Your stamina is now " << player.stamina << ". \n";
         } else if (player_command == 0) {
             std::cout<< "You were too slow to react! \n";
+            replenish_stamina(player, 8);
+            std::cout<< "Your stamina is now " << player.stamina << ". \n";
         } else if (player_command == 1) {
-            drain_stamina(player, 5);
-            attempt_strike(enemy, 5);
-            std::cout << "The enemy is at " << enemy.hp << " health! \n";
+            std::cout << player.character_name << " strikes "<< enemy.character_name 
+                  << ", dealing " <<  attempt_strike(player, enemy, unarmed_strike, 
+                                                        distance_between_characters)
+                  << " damage! \n";
+            std::cout << "The enemy is now at " << enemy.hp << " health! \n";
         } else if (player_command == 2) {
             replenish_hp(player, 5);
             std::cout << "You healed yourself to " << player.hp << " health! \n";      
@@ -298,6 +346,8 @@ int main(int argc, char** argv) try {
     parse_args(argc, argv);
     interactor io{std::cin, std::cout};
 
+    //std::cout << unarmed_strike; TODO: fix (compile error)
+
     io.print_slow("Welcome, player 1. Welcome...");
     sleep_for(config.long_delay * 3);
 
@@ -311,7 +361,7 @@ int main(int argc, char** argv) try {
 
     int difficulty_speed = 2000; //TODO: make configurable
 
-    fight_encounter(c1, c2, difficulty_speed);
+    fight_encounter(c1, c2, difficulty_speed, 1);
 
 
     
