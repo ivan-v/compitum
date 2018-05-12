@@ -9,6 +9,7 @@ include_directories(compitum
     PRIVATE ${PROJECT_SOURCE_DIR})
 
 add_executable(main
+    compitum/apparel.cpp
     compitum/character.cpp
     compitum/combat.cpp
     compitum/config.cpp
