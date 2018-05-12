@@ -1,23 +1,10 @@
 #include "compitum/combat.hpp"
+#include "compitum/dice.hpp"
 
 #include <cassert>
 
 // using std::chrono::milliseconds;
 // using std::this_thread::sleep_for;
-
-int compitum::roll_die(int faces) {
-   return rand() % faces + 1;
-}
-
-//TODO: fix: sometimes returns 0
-int compitum::roll_dice(int faces, int times, int modifier) {
-    srand(time(0)); //TODO: fix conversion warning
-    int result = 0;
-    for(int i = 0; i < times; i++) {
-        result += roll_die(faces);
-    }
-    return result + modifier;
-}
 
 //TODO: make armor and defense checks
 int compitum::attempt_block(character& self) {
@@ -31,13 +18,14 @@ int compitum::attempt_block(character& self) {
 }
 
 int compitum::attempt_strike(character& self, character& target,
-                    combat_action attack, int distance_between_characters) {
-    if (attack.reach_distance >= distance_between_characters 
-                      && attack.stamina_cost <= self.stamina) {
-        drain_stamina(self, attack.stamina_cost);
-        int damage_dealt = roll_dice(attack.roll_dice_faces, 
-                                   attack.roll_dice_times, 
-                                   attack.roll_dice_modifier);
+                               int distance_between_characters) {
+    if (self.attack_kind.reach_distance >= distance_between_characters 
+                      && self.attack_kind.stamina_cost <= self.stamina) {
+        drain_stamina(self, self.attack_kind.stamina_cost);
+        int damage_dealt = roll_dice(
+            self.attack_kind.roll_dice_faces,
+            self.attack_kind.roll_dice_times, 
+            self.attack_kind.roll_dice_modifier);
         drain_hp(target, damage_dealt);
         return damage_dealt;
     }
@@ -78,7 +66,7 @@ void compitum::enemy_action(character& self, character& enemy,
         if (block == 0) {
             std::cout << self.character_name << " strikes "<< enemy.character_name 
                       << ", dealing " << 
-                      attempt_strike(self, enemy, tusk, distance_between_characters)
+                      attempt_strike(self, enemy, distance_between_characters)
                       << " damage! \n";
             std::cout << enemy.character_name << " has "<< enemy.hp 
                       << " health left. \n";

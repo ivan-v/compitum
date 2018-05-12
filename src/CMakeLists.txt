@@ -12,6 +12,7 @@ add_executable(main
     compitum/character.cpp
     compitum/combat.cpp
     compitum/config.cpp
+    compitum/dice.cpp
     compitum/infrastructure.cpp
     compitum/interactor.cpp
     compitum/main.cpp

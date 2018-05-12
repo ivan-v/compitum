@@ -22,7 +22,7 @@ using namespace std::literals;
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 
-int wealth_change_of_farmers(region const& reg){
+int wealth_change_of_farmers(region const& reg) {
     return get_price(reg, trade_good_id::food) - 2;
 }
 
@@ -167,7 +167,7 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
     interactor io{std::cin, std::cout};
 
     std::cout << "Encounter began. \n";
-    io.print_slow("Hint: type 'strike' or 'heal' quickly.");
+    io.print_slow("Hint: type 'strike', 'block' or 'heal' quickly.");
     sleep_for(config.long_delay * 3);
     
     //TODO: calculate initiative, then determine who goes first
@@ -191,8 +191,8 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
             replenish_stamina(player, 8);
             std::cout<< "Your stamina is now " << player.stamina << ". \n";
         } else if (player_command == 1) {
-            int strike = attempt_strike(player, enemy, unarmed_strike, 
-                                          distance_between_characters);
+            int strike = attempt_strike(player, enemy, 
+                                        distance_between_characters);
             if (strike > 0) {
                 std::cout << player.character_name << " strikes " 
                           << enemy.character_name << ", dealing " 
@@ -230,7 +230,13 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
     }
 }
 
-
+void defend_against_wave(character& player, character& enemy, int difficulty_speed,
+                                              int distance_between_characters) {
+    while (player.hp >= 0) {
+        fight_encounter(player, enemy, difficulty_speed, 
+                            distance_between_characters);
+    }
+}
 
 int main(int argc, char** argv) try {
     parse_args(argc, argv);
@@ -242,11 +248,11 @@ int main(int argc, char** argv) try {
     sleep_for(config.long_delay * 3);
 
     character c1 {
-        "Player 1", 10, 10, 10, 20, true
+        "Player 1", 10, 10, 10, 20, true, unarmed_strike
     };
 
     character c2 {
-        "Magic Boar", 10, 10, 10, 20, true
+        "Magic Boar", 10, 10, 10, 20, true, tusk
     };
 
     int difficulty_speed = 2000; //TODO: make configurable

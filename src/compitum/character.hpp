@@ -1,6 +1,8 @@
 #ifndef COMPITUM_CHARACTER_INCLUDED
 #define COMPITUM_CHARACTER_INCLUDED
 
+#include "compitum/combat_action.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <string>
@@ -14,6 +16,7 @@ struct character {
     int hp;
     int max_hp;
     bool alive;
+    combat_action attack_kind;
 };
 
 void set_hp(character& c, int p);
