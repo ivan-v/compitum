@@ -8,6 +8,7 @@ using namespace compitum;
 using namespace std::literals;
 
 configuration compitum::config{
+    75ms,   // quick delay
     125ms,  // short delay
     350ms   // long delay
 };

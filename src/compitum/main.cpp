@@ -166,9 +166,9 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
                                                int distance_between_characters) {
     interactor io{std::cin, std::cout};
 
-    std::cout << "Encounter began. \n";
+    io.print_fast("Encounter began.");
     io.print_slow("Hint: type 'strike', 'block' or 'heal' quickly.");
-    sleep_for(config.long_delay * 3);
+    sleep_for(config.long_delay * 2);
     
     //TODO: calculate initiative, then determine who goes first
     //if (enemy.initiative > player.initiative)
@@ -178,45 +178,44 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
         enemy_action(enemy, player, distance_between_characters, block);
         block = 0;
         sleep_for(config.long_delay * 6);
-        std::cout << "Attack fast, strike true! \n";
-        int player_command = player_action(2000);
+        io.print_fast("Attack fast, strike true!");
+        int player_command = player_action(difficulty_speed);
         if (player_command == -1) {
-            std::cout<< "Command unrecognized! \n";
+            io.print_fast("Command unrecognized!");
             replenish_stamina(player, 8);
             sleep_for(config.long_delay * 2);
-            std::cout << "Your stamina replenishes to " 
-                      << player.stamina << ". \n";
+            io.print_fast("Your stamina replenishes to " + std::to_string(player.stamina));
         } else if (player_command == 0) {
-            std::cout<< "You were too slow to react! \n";
+            io.print_fast("You were too slow to react!");
             replenish_stamina(player, 8);
-            std::cout<< "Your stamina is now " << player.stamina << ". \n";
+            io.print_fast("Your stamina is now " + std::to_string(player.stamina) + ".");
         } else if (player_command == 1) {
             int strike = attempt_strike(player, enemy, 
                                         distance_between_characters);
             if (strike > 0) {
-                std::cout << player.character_name << " strikes " 
-                          << enemy.character_name << ", dealing " 
-                          <<  strike << " damage! \n";
-                std::cout << "The enemy is now at " << enemy.hp << " health! \n";
+                io.print_fast(player.character_name + " strikes " 
+                          + enemy.character_name + ", dealing " 
+                          +  std::to_string(strike) + " damage!");
+                io.print_fast("The enemy is now at " + std::to_string(enemy.hp) + " health!");
             } else {
-                std::cout << "You don't have enough stamina to attack! \n";
+                io.print_fast("You don't have enough stamina to attack!");
                 replenish_stamina(player, 8);
-                std::cout<< "Your stamina replenishes to " << player.stamina 
-                         << ". \n";
+                io.print_fast("Your stamina replenishes to " + std::to_string(player.stamina) 
+                         + ".");
             }
         } else if (player_command == 2) {
             replenish_hp(player, 5);
-            std::cout << "You healed yourself to " << player.hp << " health! \n";      
+            io.print_fast("You healed yourself to " + std::to_string(player.hp) + " health!");      
         } else if (player_command == 3) {
             io.print_slow("Being the coward that you are, you flee...");
             break; //Bad?
         }
         else if (player_command == 4) {
             if (attempt_block(player) == 0) {
-                std::cout << "You don't have enough stamina to block. \n";
+                io.print_fast("You don't have enough stamina to block.");
                 block = 0;
                 replenish_stamina(player, 8);
-                std::cout<< "Your stamina is now " << player.stamina << ". \n";
+                io.print_fast("Your stamina is now " + std::to_string(player.stamina) + ".");
             } else {
                 block = 1; 
             }
@@ -254,6 +253,8 @@ int main(int argc, char** argv) try {
     character c2 {
         "Magic Boar", 10, 10, 10, 20, true, tusk
     };
+
+    player_inventory_action(c1);
 
     int difficulty_speed = 2000; //TODO: make configurable
 

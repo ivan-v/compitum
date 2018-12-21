@@ -18,6 +18,8 @@ struct apparel {
     int value;
 };
 
+std::ostream& print(std::ostream&, apparel const&);
+
 bool operator==(apparel, apparel);
 
 inline bool operator!=(apparel a, apparel b) { return !(a == b); }

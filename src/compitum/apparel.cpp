@@ -2,6 +2,11 @@
 
 namespace compitum {
 
+std::ostream& compitum::print(std::ostream& out, apparel const& a) {
+    return out << a.armor_name << " ( weight: " << a.weight << ", damage sustained"
+        << a.damage_sustained << ", of value " << a.value << " )\n";
+}
+
 bool operator==(apparel a, apparel b) {
     return a.armor_name             == b.armor_name
         && a.damage_buff            == b.damage_buff

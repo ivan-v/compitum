@@ -7,7 +7,7 @@
 namespace compitum {
 
 extern struct configuration {
-    std::chrono::milliseconds short_delay, long_delay;
+    std::chrono::milliseconds quick_delay, short_delay, long_delay;
 } config;
 
 // Throws on error (unreadable file, unrecognized config key, etc.).

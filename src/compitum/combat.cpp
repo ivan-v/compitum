@@ -1,8 +1,8 @@
 #include "compitum/combat.hpp"
 #include "compitum/dice.hpp"
+#include "compitum/interactor.hpp"
 
 #include <cassert>
-
 // using std::chrono::milliseconds;
 // using std::this_thread::sleep_for;
 
@@ -58,25 +58,26 @@ int compitum::player_action(int milliseconds_allowed) {
 //TODO: make enemy action functions, such as different attacks
 void compitum::enemy_action(character& self, character& enemy, 
                   int distance_between_characters, int block) {
+    interactor io{std::cin, std::cout};
     if (self.hp < 10) {
         replenish_hp(self, 5);
-        std::cout << self.character_name << " healed themselves to "
-                  << self.hp << " health! \n";
+        io.print_fast(self.character_name + " healed themselves to "
+                  + std::to_string(self.hp) + " health!");
     } else if (self.stamina >= 5) {
         if (block == 0) {
-            std::cout << self.character_name << " strikes "<< enemy.character_name 
-                      << ", dealing " << 
-                      attempt_strike(self, enemy, distance_between_characters)
-                      << " damage! \n";
-            std::cout << enemy.character_name << " has "<< enemy.hp 
-                      << " health left. \n";
+            io.print_fast(self.character_name + " strikes " + enemy.character_name 
+                      + ", dealing " + 
+                      std::to_string(attempt_strike(self, enemy, distance_between_characters))
+                      + " damage!");
+            io.print_fast(enemy.character_name + " has " + std::to_string(enemy.hp) 
+                      + " health left.");
         } else {
-            std::cout << enemy.character_name << " successfully blocks "
-                      << self.character_name << "'s attack! \n"; 
+            io.print_fast(enemy.character_name + " successfully blocks "
+                      + self.character_name + "'s attack!"); 
         } 
     } else {
         replenish_stamina(self, 3);
-        std::cout << self.character_name << " repleninshes their stamina. \n";
+        io.print_fast(self.character_name + " repleninshes their stamina.");
     }
 }
 

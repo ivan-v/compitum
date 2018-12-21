@@ -17,6 +17,8 @@ int attempt_block(character& self);
 
 int player_action(int milliseconds_allowed);
 
+int player_action();
+
 void enemy_action(character& self, character& enemy, 
                   int distance_between_characters, int block);
 

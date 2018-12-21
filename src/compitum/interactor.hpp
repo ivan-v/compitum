@@ -12,6 +12,7 @@ struct interactor {
     std::ostream& out;
 
     void print_slow(std::string const&) const;
+    void print_fast(std::string const&) const;
 };
 
 template <class T>

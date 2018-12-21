@@ -44,8 +44,10 @@ void unequip_hand_armor(character& c);
 
 void pick_up_apparel(character& c, apparel a);
 
-void remove_apparel(character&c, apparel a);
+void remove_apparel(character& c, apparel a);
 
+void player_inventory_action(character& self);
 }
+
 
 #endif

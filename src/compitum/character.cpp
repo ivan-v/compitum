@@ -68,3 +68,20 @@ void compitum::remove_apparel(character&c, apparel a) {
     auto& v =  c.character_inventory.apparel_list;
     v.erase(std::find(v.begin(), v.end(), a)); 
 }
+
+void compitum::player_inventory_action(character& self) {
+    std::string input;
+    std::cin >> input;
+    //if (input == "list apparel")
+            //self.inventory.apparel_list;
+    /*else*/ if (input == "equip " + pugilist_gloves.armor_name) {
+        equip_armor(self, pugilist_gloves);
+        std::cout << pugilist_gloves.armor_name << " equipped! \n";
+    }
+
+        //     return 2;
+        // else if (input == "flee")
+        //     return 3;
+        // else if (input == "block")
+        //     return 4;
+}
