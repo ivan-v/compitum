@@ -5,7 +5,8 @@
 #include "compitum/interactor.hpp"
 #include "compitum/region.hpp"
 
-#include <cassert>
+#include "compitum/clock.hpp"
+
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -22,51 +23,6 @@ using std::this_thread::sleep_for;
 region simulate_turn(region reg) {
     //reg = starve_turn_tick(reg);
     return reg;
-}
-
-struct world_time {
-    int year;
-    int month;  // 1 through 12
-    int day;    // 1 through 31
-    int hour;   // 0 through 23
-    int minute; // 0 through 59
-};
-
-std::string get_month_name(int month) {
-    switch (month) {
-        case 1: return "January";
-        case 2: return "February";
-        case 3: return "March";
-        case 4: return "April";
-        case 5: return "May";
-        case 6: return "June";
-        case 7: return "July";
-        case 8: return "August";
-        case 9: return "September";
-        case 10: return "October";
-        case 11: return "November";
-        case 12: return "December";
-    }
-    assert(false);
-    return "month{" + std::to_string(month) + "}";
-}
-
-void print(interactor& io, world_time t) {
-    std::string minute_string =
-        (t.minute < 10 ? "0" : "") + std::to_string(t.minute);
-    io  << t.hour << ":" << minute_string
-        << " on " << get_month_name(t.month)
-        << " " << t.day
-        << ", the year of our lord " << t.year
-        << "\n";
-}
-
-void initialize_time() {
-    // TODO
-}
-
-void get_ingame_time() {
-    // TODO
 }
 
 struct world {
@@ -106,7 +62,7 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
         sleep_for(config.long_delay * 1);
         enemy_action(enemy, player, distance_between_characters, block);
         block = 0;
-        sleep_for(config.long_delay * 6);
+        sleep_for(config.long_delay * .5);
         io.print_fast("Attack fast, strike true!");
         int player_command = player_action(player, difficulty_speed);
         if (player_command == -1) {
@@ -195,10 +151,6 @@ int main(int argc, char** argv) try {
 
     fight_encounter(c1, c2, difficulty_speed, 1);
 
-
-    
-
-
     region reg1 {
         { farm, well },                     // infrastructures
     };
@@ -207,7 +159,6 @@ int main(int argc, char** argv) try {
         reg1,
         {1352, 1, 2, 3, 4},
     };
-
    
     for (std::string line; getline(std::cin, line) && !is_quit(line);) {
         if (line.empty()) {

@@ -12,6 +12,7 @@ include_directories(compitum
 add_executable(main
     compitum/apparel.cpp
     compitum/character.cpp
+    compitum/clock.cpp
     compitum/combat.cpp
     compitum/config.cpp
     compitum/dice.cpp
