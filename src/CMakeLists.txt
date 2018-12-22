@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.10)
 
 project(Compitum LANGUAGES CXX)
 
+set(CMAKE_CXX_COMPILER clang-cl)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 include_directories(compitum
     PRIVATE ${PROJECT_SOURCE_DIR})

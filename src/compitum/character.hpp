@@ -3,6 +3,7 @@
 
 #include "compitum/combat_action.hpp"
 #include "compitum/apparel.hpp"
+
 #include "compitum/inventory.hpp"
 
 #include <chrono>
@@ -18,6 +19,7 @@ struct character {
     int hp;
     int max_hp;
     bool alive;
+
     combat_action attack_kind;
     apparel torso;
     apparel feet;
@@ -47,6 +49,9 @@ void pick_up_apparel(character& c, apparel a);
 void remove_apparel(character& c, apparel a);
 
 void player_inventory_action(character& self);
+
+void list_inventory(character& c);
+
 }
 
 

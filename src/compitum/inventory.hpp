@@ -9,6 +9,7 @@
 namespace compitum {
 
 struct inventory {
+    int gold;
     int weight;
     int weight_limit;
     int value;

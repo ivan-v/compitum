@@ -1,0 +1,36 @@
+----Intro----
+"My lord! How do you feel? How is your head?"
+
+Responses:
+1. "I... I'm fine. "
+2. "What happened? "
+3. "Why do you wake me, peasant?! "
+4. "Fetch some ale, I need it. "
+
+1.0. "Good to hear! You should still be careful, sire. Your memory is probably still clouded. "
+2.0. "You were on a hunting expedition with your father... There was a treacherous accident... You barely made it back, lying back across your horse. Your retinue was slain, and your father, the lord, was nowhere to be seen. "
+3.0. "Sorry, sire, but we need you in these trying times. You are the head of the family and this manor, now. " 
+
+
+4. "Fetch some ale, I need it. "
+
+1.0. -> 2. , 4.0
+3.0 -> 2. , 4.0
+
+
+-----------
+
+
+----Routine-----
+"My lord! Good morning. The manor looks good today. Do you wish to review the accounts? "
+
+
+
+
+
+----Weather----
+"The rain falls on us today. This will slow down any enemies, but us too. Our land will be safe from the hellfire of our enemies... and unfortunately, we will not be able to burn them today. "
+"Today is a sunny day, my lord. Excellent visibility. I say, let them fear our walls! "
+"Fog covers our lands today, sire. I don't feel good about this... "
+
+

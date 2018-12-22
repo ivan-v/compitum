@@ -1,0 +1,69 @@
+Game Progression:
+
+Chapter 1: Wake up from the incident, in the manor. 
+	Assess property & meet characters/retinue. 
+		Tavernkeep (recruit) 
+		Blacksmith (buy personal weapons/armors, or upgrade guards')
+		Builder (upgrade estate, build defenses, repair)
+		Great hall (hold court, assess events, decisions, and accounts)
+
+	
+	Few minor decisions: 
+		Organize search party for your father
+
+
+Chapter 2: The siege begins.
+	Decide where the guards should go. 
+	Participate in combat (optional).
+
+Chapter 3: New Normal.
+	Normal days
+	Night attacks
+
+Chapter 4: Paranormal
+	Hauntings happen
+
+Chapter 5: Explore out into the Wild
+
+-------------------------
+Estate management:
+	IF:
+		Not enough money:
+			Guards retire
+		No peasants left:
+			No income from production
+		No tavern: 
+			No recruitment or tax income
+		No blacksmith: 
+			No blacksmith services
+		No Builder: 
+			No builder services
+		No Great Hall:
+			//TODO
+
+	Money:
+		Raise taxes (+future_income)
+		Lower taxes (-future_income)
+	Guards:
+		Hire from tavern (-money (decide equipment_quality), -future_income)
+		Conscript peasants as guards (-money (decide equipment_quality), -peasant_population)
+		Upgrade equipment (-money)
+		Retire guards (+future_income)
+
+------------------------
+View:
+
+| Date: X of month Y, year Z | Money: total (expected gain/loss) | Population of estate |
+
+
+
+
+
+
+|                     |
+|                     |
+|                     |
+|					  |
+|                     |
+|					  |
+|________| | |________|

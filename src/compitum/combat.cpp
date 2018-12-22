@@ -19,8 +19,7 @@ int compitum::attempt_block(character& self) {
 
 int compitum::attempt_strike(character& self, character& target,
                                int distance_between_characters) {
-    if (self.attack_kind.reach_distance >= distance_between_characters 
-                      && self.attack_kind.stamina_cost <= self.stamina) {
+    if (self.attack_kind.stamina_cost <= self.stamina) {
         drain_stamina(self, self.attack_kind.stamina_cost);
         int damage_dealt = roll_dice(
             self.attack_kind.roll_dice_faces,
@@ -33,14 +32,14 @@ int compitum::attempt_strike(character& self, character& target,
 }
 
 //player must type in attack quickly enough
-int compitum::player_action(int milliseconds_allowed) {
+int compitum::player_action(character& self, int milliseconds_allowed) {
     std::string input;
     auto start = std::chrono::steady_clock::now();
-    std::cin >> input;
+    getline(std::cin, input);
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                                 std::chrono::steady_clock::now( ) - start);
     if (elapsed.count() < milliseconds_allowed) {
-        if (input == "strike")
+        if (input.compare(self.attack_kind.name)==0)
             return 1;
         else if (input == "heal")
             return 2;
@@ -80,4 +79,3 @@ void compitum::enemy_action(character& self, character& enemy,
         io.print_fast(self.character_name + " repleninshes their stamina.");
     }
 }
-

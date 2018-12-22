@@ -15,7 +15,7 @@ int attempt_strike(character& self, character& target,
 
 int attempt_block(character& self);
 
-int player_action(int milliseconds_allowed);
+int player_action(character& self, int milliseconds_allowed);
 
 int player_action();
 

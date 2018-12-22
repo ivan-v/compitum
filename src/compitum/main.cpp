@@ -22,74 +22,6 @@ using namespace std::literals;
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 
-int wealth_change_of_farmers(region const& reg) {
-    return get_price(reg, trade_good_id::food) - 2;
-}
-
-// double tax_farmers(region const& reg, double tax_rate){
-//      return reg.pop.faction_id::farmers.pop;
-// }
-
-// TODO: Don't always round fractional populations up.
-population kill_people(population pop, int count) {
-    double survival_rate =
-        static_cast<double>(pop.total() - count) / pop.total();
-    int killed = 0;
-    for (auto pos = begin(pop.factions);
-            pos != end(pop.factions) && killed < count;
-            ++pos) {
-        auto& fac = pos->second;
-        int new_pop = static_cast<int>(std::floor(fac.pop * survival_rate));
-        killed += fac.pop - new_pop;
-        fac.pop = new_pop;
-    }
-    return pop;
-}
-
-region update_food_amount(region reg) {
-    int food_produced = gross_production(reg, trade_good_id::food);
-    int& food_amount = reg.trade_good_amounts[trade_good_id::food];
-    food_amount += food_produced;
-    int old_total = reg.pop.total();
-    if (food_amount < 0) {
-        reg.pop = kill_people(reg.pop, -food_amount);
-        int const starved = old_total - reg.pop.total();
-        std::cout
-            << "The people starve!\n"
-            << starved << " people have died.\n";
-    }
-    if (food_produced > 0) {
-        std::cout
-            << "A surplus of " << food_produced
-            << " food has been produced.\n";
-    }
-    return reg;
-}
-
-region update_water_amount(region reg) {
-    int& water_amount = reg.trade_good_amounts[trade_good_id::water];
-    water_amount += gross_production(reg, trade_good_id::water);
-    if (water_amount < 0) {
-        int old_total = reg.pop.total();
-        reg.pop = kill_people(reg.pop, -water_amount);
-        int const starved = old_total - reg.pop.total();
-        std::cout
-            << "The people die of thirst!\n"
-            << starved << " people have died.\n";
-    }
-    return reg;
-}
-
-region starve_turn_tick(region reg) {
-    std::cout
-        << "Regional price of food: "
-        << get_price(reg, trade_good_id::food)
-        << '\n';
-    reg = update_food_amount(reg);
-    reg = update_water_amount(reg);
-    return reg;
-}
-
 region simulate_turn(region reg) {
     reg = starve_turn_tick(reg);
     return reg;
@@ -174,16 +106,16 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
     //if (enemy.initiative > player.initiative)
     int block = 0;
     while (player.hp >= 0 && enemy.hp >= 0) {
-        sleep_for(config.long_delay * 3);
+        sleep_for(config.long_delay * 1);
         enemy_action(enemy, player, distance_between_characters, block);
         block = 0;
         sleep_for(config.long_delay * 6);
         io.print_fast("Attack fast, strike true!");
-        int player_command = player_action(difficulty_speed);
+        int player_command = player_action(player, difficulty_speed);
         if (player_command == -1) {
             io.print_fast("Command unrecognized!");
             replenish_stamina(player, 8);
-            sleep_for(config.long_delay * 2);
+            sleep_for(config.long_delay * 1);
             io.print_fast("Your stamina replenishes to " + std::to_string(player.stamina));
         } else if (player_command == 0) {
             io.print_fast("You were too slow to react!");
@@ -241,14 +173,20 @@ int main(int argc, char** argv) try {
     parse_args(argc, argv);
     interactor io{std::cin, std::cout};
 
-    //std::cout << unarmed_strike; TODO: fix (compile error)
-
-    io.print_slow("Welcome, player 1. Welcome...");
-    sleep_for(config.long_delay * 3);
-
     character c1 {
         "Player 1", 10, 10, 10, 20, true, unarmed_strike
     };
+
+    while (true) {
+        std::string input;
+        getline(std::cin, input);
+        if (input == "inv" || input == "inventory") {
+            //list_inventory(c1);
+        }
+    }
+
+    //io.print_slow("Welcome, player 1. Welcome...");
+    sleep_for(config.long_delay * 3);
 
     character c2 {
         "Magic Boar", 10, 10, 10, 20, true, tusk
@@ -256,7 +194,7 @@ int main(int argc, char** argv) try {
 
     player_inventory_action(c1);
 
-    int difficulty_speed = 2000; //TODO: make configurable
+    int difficulty_speed = 20000; //TODO: make configurable
 
     fight_encounter(c1, c2, difficulty_speed, 1);
 

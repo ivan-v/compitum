@@ -85,3 +85,7 @@ void compitum::player_inventory_action(character& self) {
         // else if (input == "block")
         //     return 4;
 }
+
+void list_inventory(character& c) {
+    std::cout << "qop\n";
+}

@@ -1,0 +1,22 @@
+upgrade the estate
+	manor house
+		new rooms
+			library
+			apothecary
+			guest bedrooms
+		expand great hall
+	walls
+		wooden stockade -> wooden walls -> stone ->
+		towers
+			wood -> stone
+			1 floor -> 2 floors -> 3 floors
+
+upgrade the land
+	
+	
+
+tavern
+	more rooms
+
+
+
