@@ -1,12 +1,9 @@
 #include "compitum/character.hpp"
 #include "compitum/combat.hpp"
 #include "compitum/config.hpp"
-#include "compitum/faction.hpp"
 #include "compitum/infrastructure.hpp"
 #include "compitum/interactor.hpp"
-#include "compitum/population.hpp"
 #include "compitum/region.hpp"
-#include "compitum/trade_good.hpp"
 
 #include <cassert>
 #include <chrono>
@@ -23,7 +20,7 @@ using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 
 region simulate_turn(region reg) {
-    reg = starve_turn_tick(reg);
+    //reg = starve_turn_tick(reg);
     return reg;
 }
 
@@ -162,7 +159,7 @@ void fight_encounter(character& player, character& enemy, int difficulty_speed,
 }
 
 void defend_against_wave(character& player, character& enemy, int difficulty_speed,
-                                              int distance_between_characters) {
+                                                  int distance_between_characters) {
     while (player.hp >= 0) {
         fight_encounter(player, enemy, difficulty_speed, 
                             distance_between_characters);
@@ -203,23 +200,6 @@ int main(int argc, char** argv) try {
 
 
     region reg1 {
-        30,         // provincial production value
-        1.00,       // "goods produced" modifier
-        {           // population
-            {       // factions:  wealth, population, opinions
-                { faction_id::bandits,     { 0, 10, {} } },
-                { faction_id::blacksmiths, { 0, 20, {} } },
-                { faction_id::builders,    { 0,  0, {} } },
-                { faction_id::craftsmen,   { 0,  0, {} } },
-                { faction_id::guards,      { 0,  0, {} } },
-                { faction_id::traders,     { 0, 10, {} } },
-                { faction_id::prostitutes, { 0, 10, {} } },
-            }
-        },
-        {
-            { trade_good_id::food, 10 },    // goods: price constant, amount
-            { trade_good_id::water, 10 },
-        },
         { farm, well },                     // infrastructures
     };
 
@@ -228,16 +208,11 @@ int main(int argc, char** argv) try {
         {1352, 1, 2, 3, 4},
     };
 
-    auto prompt = [&] {
-        print(io, w.t1);
-        io << reg1 << "\nEnter blank line or quit.\n";
-    };
-
-    prompt();
+   
     for (std::string line; getline(std::cin, line) && !is_quit(line);) {
         if (line.empty()) {
-            reg1 = simulate_turn(reg1);
-            prompt();
+            //reg1 = simulate_turn(reg1);
+            //prompt();
         } else {
             std::cout << "bad input: " << line;
         }

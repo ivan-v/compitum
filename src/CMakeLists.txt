@@ -18,9 +18,7 @@ add_executable(main
     compitum/infrastructure.cpp
     compitum/interactor.cpp
     compitum/main.cpp
-    compitum/population.cpp
     compitum/region.cpp
-    compitum/trade_good.cpp
     )
 
 if(MSVC)
