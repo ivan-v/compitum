@@ -12,4 +12,8 @@ namespace {
         double production_modifier;
     };
 
+    region simulate_turn(region reg) {
+    //reg = starve_turn_tick(reg);
+        return reg;
+    }
 }

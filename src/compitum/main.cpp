@@ -25,11 +25,6 @@ region simulate_turn(region reg) {
     return reg;
 }
 
-struct world {
-    region reg1; // TODO: Make vector of regions
-    world_time t1;
-};
-
 bool is_quit(std::string const& line) {
     return !line.empty() && line.front() == 'q';
 }
