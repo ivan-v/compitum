@@ -3,6 +3,7 @@
 
 #include "compitum/combat_action.hpp"
 
+#include <iostream>
 #include <string>
 
 namespace compitum {

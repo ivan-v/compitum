@@ -20,11 +20,6 @@ using namespace std::literals;
 using std::chrono::milliseconds;
 using std::this_thread::sleep_for;
 
-region simulate_turn(region reg) {
-    //reg = starve_turn_tick(reg);
-    return reg;
-}
-
 bool is_quit(std::string const& line) {
     return !line.empty() && line.front() == 'q';
 }
@@ -128,8 +123,8 @@ int main(int argc, char** argv) try {
     while (true) {
         std::string input;
         getline(std::cin, input);
-        if (input == "inv" || input == "inventory") {
-            //list_inventory(c1);
+        if (input == "list apparels equipped" || input == "app") {
+            list_apparels_equipped(std::cout, c1);
         }
     }
 

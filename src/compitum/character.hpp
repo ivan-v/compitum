@@ -50,7 +50,7 @@ void remove_apparel(character& c, apparel a);
 
 void player_inventory_action(character& self);
 
-void list_inventory(character& c);
+void list_apparels_equipped(std::ostream& out, character& c);
 
 }
 

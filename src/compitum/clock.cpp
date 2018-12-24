@@ -56,5 +56,5 @@ void initialize_time() {
 }
 
 void get_ingame_time() {
-    // TODO
+    //TODO
 }

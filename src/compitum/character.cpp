@@ -64,7 +64,7 @@ void compitum::pick_up_apparel(character& c, apparel a) {
 }
 
 
-void compitum::remove_apparel(character&c, apparel a) {
+void compitum::remove_apparel(character& c, apparel a) {
     auto& v =  c.character_inventory.apparel_list;
     v.erase(std::find(v.begin(), v.end(), a)); 
 }
@@ -86,6 +86,22 @@ void compitum::player_inventory_action(character& self) {
         //     return 4;
 }
 
-void list_inventory(character& c) {
-    std::cout << "qop\n";
+void compitum::list_apparels_equipped(std::ostream& out, character& c) {
+    if (true/*c.torso*/) {
+        std::cout << "Equipped on torso: ";
+        compitum::print(out, c.torso);      
+        std::cout<< ".\n";
+    } if (true/*c.feet*/) {
+        std::cout << "Equipped on feet: ";
+        compitum::print(out, c.feet);
+        std::cout<< ".\n"; 
+    } if (true/*c.hands*/) {
+        std::cout << "Equipped on hands: ";
+        compitum::print(out, c.hands);
+        std::cout<< ".\n";
+    } if (true/*c.head*/) {
+        std::cout << "Equipped on head: ";
+        compitum::print(out, c.head); 
+        std::cout<< ".\n";
+    }
 }
